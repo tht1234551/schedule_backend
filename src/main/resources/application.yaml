@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: schedule
+  profiles:
+    active: dev
+#  mvc:
+#    servlet:
+#      path: /api
+
+
+server:
+  port: 8080
+
+jwt:
+  secret: ho0PCPYX5o5x0xNZhSGjkLgKMHLbsrPdX4plfRCWPf8=
