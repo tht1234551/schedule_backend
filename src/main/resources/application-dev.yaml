@@ -1,19 +1,9 @@
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console  # 기본값
-
   datasource:
     url: jdbc:postgresql://192.168.50.234:5432/calendar
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
-
-  jooq:
-    sql-dialect: POSTGRES
-
-
 
 logging:
   level:

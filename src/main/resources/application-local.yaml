@@ -3,16 +3,11 @@ spring:
     console:
       enabled: true
       path: /h2-console  # 기본값
-
-
   datasource:
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     username: sa
     password:
     driver-class-name: org.h2.Driver
-
-  jooq:
-    sql-dialect: H2
 
 logging:
   level:

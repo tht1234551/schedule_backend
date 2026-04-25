@@ -17,4 +17,9 @@ public class HelloController {
     public String hello2() {
         return "Hello World!";
     }
+
+    @GetMapping("/api/hello3")
+    public void hello3() {
+        throw new RuntimeException("hello3");
+    }
 }

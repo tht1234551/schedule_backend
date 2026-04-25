@@ -1,7 +1,7 @@
 package com.jhj.schedule.user.dto;
 
-import com.jhj.schedule.user.Authority;
-import com.jhj.schedule.user.User;
+import com.jhj.schedule.user.domain.Authority;
+import com.jhj.schedule.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

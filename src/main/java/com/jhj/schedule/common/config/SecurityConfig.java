@@ -1,10 +1,10 @@
 package com.jhj.schedule.common.config;
 
-import com.jhj.schedule.auth.RefreshTokenRepository;
-import com.jhj.schedule.auth.jwt.JwtUtil;
-import com.jhj.schedule.auth.userdetail.CustomUserDetailService;
-import com.jhj.schedule.auth.jwt.JwtFilter;
-import com.jhj.schedule.auth.jwt.LoginFilter;
+import com.jhj.schedule.auth.infrastructure.RefreshTokenRepository;
+import com.jhj.schedule.auth.security.jwt.JwtUtil;
+import com.jhj.schedule.auth.security.userdetail.CustomUserDetailService;
+import com.jhj.schedule.auth.security.jwt.JwtFilter;
+import com.jhj.schedule.auth.security.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +45,8 @@ public class SecurityConfig {
                 .csrf(CsrfConfigurer::disable) // REST API라면 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/hello",
+                                "/api/hello2",
+                                "/api/hello3",
                                 "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -102,6 +103,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customUserDetailService);
         provider.setPasswordEncoder(passwordEncoder());
+
         return provider;
     }
 

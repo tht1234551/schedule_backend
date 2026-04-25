@@ -1,15 +1,21 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: schedule
   profiles:
     active: dev
+  jooq:
+    sql-dialect: POSTGRES
+#  적용시 시큐리티가 junit 테스트 통과를 못함
 #  mvc:
 #    servlet:
 #      path: /api
 
 
-server:
-  port: 8080
-
 jwt:
   secret: ho0PCPYX5o5x0xNZhSGjkLgKMHLbsrPdX4plfRCWPf8=
+  expiration:
+    access: 3600000 # 한시간
+    refresh: 86400000 # 하루

@@ -1,8 +1,9 @@
 package com.jhj.schedule.auth;
 
+import com.jhj.schedule.auth.application.AuthService;
 import com.jhj.schedule.auth.dto.SignUpRequestDto;
-import com.jhj.schedule.user.User;
-import com.jhj.schedule.user.UserRepository;
+import com.jhj.schedule.user.domain.User;
+import com.jhj.schedule.user.infrastructure.UserRepository;
 import com.jhj.schedule.user.dto.UserResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

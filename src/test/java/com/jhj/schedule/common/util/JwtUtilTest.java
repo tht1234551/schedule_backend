@@ -1,6 +1,6 @@
 package com.jhj.schedule.common.util;
 
-import com.jhj.schedule.auth.jwt.JwtUtil;
+import com.jhj.schedule.auth.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

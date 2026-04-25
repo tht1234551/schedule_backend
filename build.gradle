@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.jhj'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 description = 'schedule'
 
 java {
@@ -23,7 +23,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'  // ← web 대신 webmvc 사용
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -60,6 +60,7 @@ jooq {
         main {
             generationTool {
                 logging = org.jooq.meta.jaxb.Logging.WARN
+                // TODO: 나중엔 environment로 변경
                 jdbc {
                     driver = 'org.postgresql.Driver'
                     url = 'jdbc:postgresql://192.168.50.234:5432/calendar'

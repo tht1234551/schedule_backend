@@ -1,8 +1,8 @@
 package com.jhj.schedule.job.dto;
 
-import com.jhj.schedule.job.JobEntity;
-import com.jhj.schedule.job.OpenType;
-import com.jhj.schedule.user.User;
+import com.jhj.schedule.job.domain.Job;
+import com.jhj.schedule.job.domain.OpenType;
+import com.jhj.schedule.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -29,8 +29,8 @@ public class JobRequestDto {
     private String description;
     private OpenType openType;
 
-    public JobEntity toEntity(User user) {
-        return JobEntity.builder()
+    public Job toEntity(User user) {
+        return Job.builder()
                 .title(title)
                 .startDate(startDateTime)
                 .endDate(endDateTime)

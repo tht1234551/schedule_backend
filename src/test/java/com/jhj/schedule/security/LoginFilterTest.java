@@ -1,10 +1,9 @@
 package com.jhj.schedule.security;
 
 import com.jhj.schedule.auth.dto.LoginRequestDto;
-import com.jhj.schedule.user.Authority;
-import com.jhj.schedule.user.User;
-import com.jhj.schedule.user.UserRepository;
-import jakarta.transaction.Transactional;
+import com.jhj.schedule.user.domain.Authority;
+import com.jhj.schedule.user.domain.User;
+import com.jhj.schedule.user.infrastructure.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

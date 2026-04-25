@@ -1,7 +1,7 @@
 package com.jhj.schedule.job.dto;
 
-import com.jhj.schedule.job.JobEntity;
-import com.jhj.schedule.job.OpenType;
+import com.jhj.schedule.job.domain.Job;
+import com.jhj.schedule.job.domain.OpenType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,15 +20,15 @@ public class JobResponseDto {
     private String hexColor;
     private String description;
 
-    public static JobResponseDto from(JobEntity jobEntity) {
+    public static JobResponseDto from(Job job) {
         return JobResponseDto.builder()
-                .id(jobEntity.getId())
-                .title(jobEntity.getTitle())
-                .startDateTime(jobEntity.getStartDate())
-                .endDateTime(jobEntity.getEndDate())
-                .hexColor(jobEntity.getHexColor())
-                .description(jobEntity.getDescription())
-                .openType(jobEntity.getOpenType())
+                .id(job.getId())
+                .title(job.getTitle())
+                .startDateTime(job.getStartDate())
+                .endDateTime(job.getEndDate())
+                .hexColor(job.getHexColor())
+                .description(job.getDescription())
+                .openType(job.getOpenType())
                 .build();
     }
 }
