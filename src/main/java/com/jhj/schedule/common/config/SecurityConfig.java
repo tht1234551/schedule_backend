@@ -67,7 +67,7 @@ public class SecurityConfig {
 
 
         LoginFilter loginFilter = new LoginFilter(authenticationManager, refreshTokenRepository, jwtUtil);
-        loginFilter.setFilterProcessesUrl("/api/auth/login");
+        loginFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         http
                 .authenticationProvider(authenticationProvider())
