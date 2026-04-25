@@ -1,10 +1,9 @@
 package com.jhj.schedule.auth;
 
 import com.jhj.schedule.auth.dto.SignUpRequestDto;
-import com.jhj.schedule.auth.exception.EmailAlreadyExistsException;
 import com.jhj.schedule.auth.jwt.JwtUtil;
-import com.jhj.schedule.user.UserEntity;
-import com.jhj.schedule.user.UserRepository;
+import com.jhj.schedule.user.User;
+import com.jhj.schedule.user.UserService;
 import com.jhj.schedule.user.dto.UserResponseDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,47 +15,45 @@ import java.time.LocalDateTime;
 @Service
 @AllArgsConstructor
 public class AuthService {
-    
-    final private UserRepository userRepository;
+
+    final private UserService userService;
     final private RefreshTokenRepository refreshTokenRepository;
     final private PasswordEncoder passwordEncoder;
     final private JwtUtil jwtUtil;
 
     @Transactional
     public UserResponseDto signUp(SignUpRequestDto request) {
-        validateDuplicateEmail(request.getEmail());
-
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        UserEntity user = request.toEntity(encodedPassword);
-        return UserResponseDto.from(userRepository.save(user));
-    }
 
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(encodedPassword)
+                .name(request.getName())
+                .avatar(request.getAvatar())
+                .build();
 
-    @Transactional
-    public void validateDuplicateEmail(String email) {
-        boolean existsByEmail = userRepository.existsByEmail(email);
-
-        if (existsByEmail) {
-            throw new EmailAlreadyExistsException();
-        }
+        return UserResponseDto.from(userService.create(user));
     }
 
     @Transactional
-    public String refreshToken(String refreshToken) {
+    public String createRefreshToken(String refreshToken) {
         if (jwtUtil.invalid(refreshToken)) {
             throw new RuntimeException("invalid refresh token");
         }
 
-        RefreshTokenEntity tokenEntity = refreshTokenRepository.findByToken(refreshToken)
+        RefreshToken tokenEntity = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new RuntimeException("invalid refresh token"));
 
         if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("refresh token expired");
         }
 
+        User user = userService.findById(tokenEntity.getUserId())
+                .orElseThrow(() -> new RuntimeException("invalid refresh token"));
+
         String email = jwtUtil.getEmail(refreshToken);
-        String role = tokenEntity.getUser().getAuthority().name();
-        Long id = tokenEntity.getUser().getId();
+        String role = user.getAuthority().name();
+        Long id = user.getId();
 
         return jwtUtil.createAccessToken(id, email, role);
     }

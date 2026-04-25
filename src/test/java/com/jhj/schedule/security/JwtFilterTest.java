@@ -2,9 +2,8 @@ package com.jhj.schedule.security;
 
 import com.jhj.schedule.auth.dto.LoginRequestDto;
 import com.jhj.schedule.user.Authority;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import com.jhj.schedule.user.UserRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,13 +34,13 @@ class JwtFilterTest {
 
     @BeforeEach
     void setUp() {
-        UserEntity user = UserEntity.builder()
+        User user = User.builder()
                 .email("test@test.com")
                 .password(passwordEncoder.encode("1234"))
                 .authority(Authority.ROLE_USER)
                 .build();
 
-        userRepository.save(user);
+        userRepository.insert(user);
     }
 
     @Test
@@ -53,6 +54,8 @@ class JwtFilterTest {
                 .andReturn()
                 .getResponse()
                 .getHeader("Authorization");
+
+        Assert.notNull(token, "token is null");
 
         mockMvc.perform(get("/api/hello2")
                         .header("Authorization", token))

@@ -1,6 +1,6 @@
 package com.jhj.schedule.auth.dto;
 
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.jooq.tables.records.UsersRecord;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -32,13 +32,4 @@ public class SignUpRequestDto {
     private String password;
 
     private String avatar;
-
-    public UserEntity toEntity(String encodedPassword) {
-        return UserEntity.builder()
-                .name(name)
-                .email(email)
-                .password(encodedPassword)
-                .avatar(avatar)
-                .build();
-    }
 }

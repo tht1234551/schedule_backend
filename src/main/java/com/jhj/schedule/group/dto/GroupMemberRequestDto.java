@@ -9,6 +9,5 @@ import lombok.Setter;
 @Setter
 @Builder
 public class GroupMemberRequestDto {
-    private Long userId;
-    private GroupRole role;
+    private String inviteEmail;
 }

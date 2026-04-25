@@ -2,7 +2,7 @@ package com.jhj.schedule.job.dto;
 
 import com.jhj.schedule.job.JobEntity;
 import com.jhj.schedule.job.OpenType;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class JobRequestDto {
     private String description;
     private OpenType openType;
 
-    public JobEntity toEntity(UserEntity user) {
+    public JobEntity toEntity(User user) {
         return JobEntity.builder()
                 .title(title)
                 .startDate(startDateTime)
@@ -37,7 +37,7 @@ public class JobRequestDto {
                 .hexColor(hexColor)
                 .description(description)
                 .openType(openType)
-                .user(user)
+                .userId(user.getId())
                 .build();
     }
 }

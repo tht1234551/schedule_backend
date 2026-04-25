@@ -1,10 +1,10 @@
 package com.jhj.schedule.auth.jwt;
 
-import com.jhj.schedule.auth.RefreshTokenEntity;
+import com.jhj.schedule.auth.RefreshToken;
 import com.jhj.schedule.auth.RefreshTokenRepository;
 import com.jhj.schedule.auth.dto.LoginRequestDto;
 import com.jhj.schedule.auth.userdetail.CustomUserDetail;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -62,7 +61,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     protected void successfulAuthentication(@NonNull HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
         CustomUserDetail customUserDetail = (CustomUserDetail) auth.getPrincipal();
-        UserEntity user = customUserDetail.getUser();
+        User user = customUserDetail.getUser();
 
         String role = customUserDetail.getAuthorities()
                 .iterator()
@@ -76,13 +75,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String accessToken = jwtUtil.createAccessToken(id, email, role);
 
         LocalDateTime expiryDate = LocalDateTime.now().plusHours(1);
-        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
-                .user(user)
+        RefreshToken refreshTokenEntity = RefreshToken.builder()
+                .userId(user.getId())
                 .token(refreshToken)
                 .expiryDate(expiryDate)
                 .build();
 
-        refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepository.deleteByUserId(user.getId());
         refreshTokenRepository.save(refreshTokenEntity);
 
         res.addHeader("Authorization", "Bearer " + accessToken); // JWT를 Authorization 헤더에 추가

@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
@@ -22,10 +21,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /*
-     * 가입후에 유저정보와 토큰값을 넘긴다
-     * 토큰값 넘기는건 아직 미완성
-     */
+
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signUp(@Valid @RequestBody SignUpRequestDto request) {
         UserResponseDto userResponseDto = authService.signUp(request);
@@ -36,7 +32,7 @@ public class AuthController {
     public ResponseEntity<?> refresh(
             @CookieValue(name = "refreshToken", required = false) String refreshToken) {
         Optional.ofNullable(refreshToken).orElseThrow(RefreshTokenNotFoundException::new);
-        String newRefreshToken = authService.refreshToken(refreshToken);
+        String newRefreshToken = authService.createRefreshToken(refreshToken);
 
         return ResponseEntity.ok()
                 .header("Authorization", "Bearer " + newRefreshToken)

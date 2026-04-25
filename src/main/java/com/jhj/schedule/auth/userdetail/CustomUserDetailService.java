@@ -1,6 +1,7 @@
 package com.jhj.schedule.auth.userdetail;
 
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.jooq.tables.records.UsersRecord;
+import com.jhj.schedule.user.User;
 import com.jhj.schedule.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -18,10 +19,10 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     @NonNull
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByEmail(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원"));
 
-        return new CustomUserDetail(userEntity);
+        return new CustomUserDetail(user);
     }
 
 }

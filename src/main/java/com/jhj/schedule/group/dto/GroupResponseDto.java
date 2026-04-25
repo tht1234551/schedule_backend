@@ -1,7 +1,6 @@
 package com.jhj.schedule.group.dto;
 
-import com.jhj.schedule.group.GroupEntity;
-import com.jhj.schedule.group.GroupMemberEntity;
+import com.jhj.schedule.group.Group;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,17 +19,17 @@ public class GroupResponseDto {
     private LocalDateTime updatedAt;
 
 
-    public static GroupResponseDto from(GroupEntity groupEntity) {
+    public static GroupResponseDto from(Group group) {
         return GroupResponseDto.builder()
-                .id(groupEntity.getId())
-                .groupName(groupEntity.getGroupName())
+                .id(group.getId())
+                .groupName(group.getGroupName())
                 .members(
-                        groupEntity.getMembers().stream()
+                        group.getMembers().stream()
                         .map(GroupMemberResponseDto::from)
                         .toList()
                 )
-                .createdAt(groupEntity.getCreatedAt())
-                .updatedAt(groupEntity.getUpdatedAt())
+                .createdAt(group.getCreatedAt())
+                .updatedAt(group.getUpdatedAt())
                 .build();
     }
 }

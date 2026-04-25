@@ -2,7 +2,7 @@ package com.jhj.schedule.security;
 
 import com.jhj.schedule.auth.dto.LoginRequestDto;
 import com.jhj.schedule.user.Authority;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import com.jhj.schedule.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,13 +38,13 @@ class LoginFilterTest {
 
     @BeforeEach
     void setUp() {
-        UserEntity user = UserEntity.builder()
+        User user = User.builder()
                 .email("test@test.com")
                 .password(passwordEncoder.encode("1234"))
                 .authority(Authority.ROLE_USER)
                 .build();
 
-        userRepository.save(user);
+        userRepository.insert(user);
     }
 
     @Test

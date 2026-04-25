@@ -6,6 +6,7 @@ import com.jhj.schedule.job.exception.InvalidJobPeriodException;
 import com.jhj.schedule.job.exception.JobNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -40,10 +41,31 @@ public class ControllerAdvice {
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
+    @ExceptionHandler(CustomRuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomRuntimeException e) {
+        HttpStatus status = e.getBaseErrorCode().getStatus();
+        String message = e.getMessage();
+
+        ErrorResponse response = ErrorResponse.builder(e, status, message)
+                .build();
+
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("서버 오류가 발생했습니다.");
+                .status(status)
+                .body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        e.printStackTrace();
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String message = "서버 오류가 발생했습니다.";
+
+        ErrorResponse response = ErrorResponse.builder(e, status, message)
+                .build();
+
+        return ResponseEntity
+                .status(status)
+                .body(response);
     }
 }

@@ -17,9 +17,9 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15;
+    private final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60;
 
-    private final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60;
+    private final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24;
 
     // JWT Token 발급
     public String createToken(Claims claims, long expireTimeMs) {

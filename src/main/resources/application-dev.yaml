@@ -10,13 +10,8 @@ spring:
     password: admin
     driver-class-name: org.postgresql.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  jooq:
+    sql-dialect: POSTGRES
 
 
 

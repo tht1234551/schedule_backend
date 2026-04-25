@@ -1,10 +1,10 @@
 package com.jhj.schedule.group;
 
 import com.jhj.schedule.auth.userdetail.CustomUserDetail;
-import com.jhj.schedule.group.dto.GroupRequestDto;
-import com.jhj.schedule.group.dto.GroupResponseDto;
-import com.jhj.schedule.group.dto.GroupSummaryResponseDto;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.group.dto.*;
+import com.jhj.schedule.user.User;
+import com.jhj.schedule.user.dto.UserResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class GroupController {
     ResponseEntity<List<GroupSummaryResponseDto>> getGroup(
             @AuthenticationPrincipal CustomUserDetail userDetail
     ) {
-        UserEntity user = userDetail.getUser();
+        User user = userDetail.getUser();
         List<GroupSummaryResponseDto> groups = groupService.findGroups(user);
         return ResponseEntity.ok(groups);
     }
@@ -32,12 +32,22 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<GroupResponseDto> createGroup(
             @AuthenticationPrincipal CustomUserDetail userDetail,
-            @RequestBody GroupRequestDto request
+            @RequestBody GroupRequestDto dto
     ) {
-        UserEntity user = userDetail.getUser();
-        GroupResponseDto groupResponseDto = groupService.createGroup(user, request);
+        User user = userDetail.getUser();
+        GroupResponseDto groupResponseDto = groupService.createGroup(user, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(groupResponseDto);
     }
 
+    @PostMapping("/{groupId}/invitations")
+    public ResponseEntity<List<GroupMemberResponseDto>> invite(
+            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @PathVariable Long groupId,
+            @Valid @RequestBody GroupInviteRequestDto dto
+    ) {
+        User inviter = userDetail.getUser();
+        List<GroupMemberResponseDto> created = groupService.invite(inviter, groupId, dto.getInvitations());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
 
 }

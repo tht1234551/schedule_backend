@@ -4,7 +4,7 @@ import com.jhj.schedule.auth.userdetail.CustomUserDetail;
 import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.job.dto.JobRequestDto;
 import com.jhj.schedule.job.dto.JobResponseDto;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class JobController {
     ResponseEntity<JobResponseDto> addJob(
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @Valid @RequestBody JobRequestDto request) {
-        UserEntity user = userDetail.getUser();
+        User user = userDetail.getUser();
         JobResponseDto jobResponseDto = jobService.saveJob(request.toEntity(user));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(jobResponseDto);
@@ -45,7 +45,7 @@ public class JobController {
             @PathVariable Long jobId,
             @Valid @RequestBody JobRequestDto request
     ) {
-        UserEntity user = userDetail.getUser();
+        User user = userDetail.getUser();
         JobResponseDto response = jobService.modifyJob(jobId, user, request);
 
         return ResponseEntity.ok(response);
@@ -56,7 +56,7 @@ public class JobController {
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @PathVariable Long jobId
     ) {
-        UserEntity user = userDetail.getUser();
+        User user = userDetail.getUser();
         jobService.deleteJob(jobId, user);
 
         return ResponseEntity.noContent().build();

@@ -1,6 +1,6 @@
 package com.jhj.schedule.group.dto;
 
-import com.jhj.schedule.group.GroupMemberEntity;
+import com.jhj.schedule.group.GroupMember;
 import com.jhj.schedule.group.GroupRole;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,11 +12,11 @@ public class GroupMemberResponseDto {
     private String username;
     private GroupRole role;
 
-    public static GroupMemberResponseDto from(GroupMemberEntity groupMemberEntity) {
+    public static GroupMemberResponseDto from(GroupMember groupMember) {
         return GroupMemberResponseDto.builder()
-                .userId(groupMemberEntity.getUser().getId())
-                .username(groupMemberEntity.getUser().getName())
-                .role(groupMemberEntity.getRole())
+                .userId(groupMember.getUserId())
+                .username(groupMember.getUserName())
+                .role(groupMember.getRole())
                 .build();
     }
 }

@@ -2,7 +2,7 @@ package com.jhj.schedule.auth.jwt;
 
 import com.jhj.schedule.auth.userdetail.CustomUserDetail;
 import com.jhj.schedule.user.Authority;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,14 +52,14 @@ public class JwtFilter extends OncePerRequestFilter {
             Long id = jwtUtil.getId(token);
 
             // 인증 객체 생성
-            UserEntity userEntity = UserEntity.builder()
+            User user = User.builder()
                     .id(id)
                     .email(email)
                     .password(null)
                     .authority(Authority.valueOf(role))
                     .build();
 
-            CustomUserDetail customUserDetails = new CustomUserDetail(userEntity);
+            CustomUserDetail customUserDetails = new CustomUserDetail(user);
             Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
             // SecurityContext에 인증 정보 저장 (STATLESS 모드이므로 요청 종료 시 소멸)

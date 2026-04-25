@@ -1,9 +1,8 @@
 package com.jhj.schedule.auth;
 
 import com.jhj.schedule.auth.dto.SignUpRequestDto;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import com.jhj.schedule.user.UserRepository;
-import com.jhj.schedule.auth.dto.LoginRequestDto;
 import com.jhj.schedule.user.dto.UserResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,7 @@ class AuthServiceTest {
 
         given(userRepository.existsByEmail(email)).willReturn(false);
         given(passwordEncoder.encode(rawPassword)).willReturn(encodedPassword);
-        given(userRepository.save(any(UserEntity.class))).willAnswer(i -> i.getArgument(0));
+        given(userRepository.insert(any(User.class))).willAnswer(i -> i.getArgument(0));
 
         // when
         UserResponseDto response = authService.signUp(request);
@@ -56,7 +55,7 @@ class AuthServiceTest {
         // then
         assertThat(response.getEmail()).isEqualTo(request.getEmail());
         assertThat(response.getName()).isEqualTo(request.getName());
-        verify(userRepository, times(1)).save(any(UserEntity.class));
+        verify(userRepository, times(1)).insert(any(User.class));
     }
 
     @Test
@@ -74,6 +73,6 @@ class AuthServiceTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("이미 존재하는 이메일입니다.");
 
-        verify(userRepository, never()).save(any(UserEntity.class));
+        verify(userRepository, never()).insert(any(User.class));
     }
 }

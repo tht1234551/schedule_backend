@@ -1,6 +1,5 @@
 package com.jhj.schedule.auth.userdetail;
 
-import com.jhj.schedule.user.UserEntity;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -9,9 +8,9 @@ import java.util.List;
 
 @Getter
 public class CustomUserDetail extends User {
-    private final UserEntity user;
+    private final com.jhj.schedule.user.User user;
 
-    public CustomUserDetail(UserEntity user) {
+    public CustomUserDetail(com.jhj.schedule.user.User user) {
         super(
                 user.getEmail(),
                 user.getPassword(),

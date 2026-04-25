@@ -11,13 +11,8 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  jooq:
+    sql-dialect: H2
 
 logging:
   level:

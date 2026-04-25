@@ -1,6 +1,7 @@
 package com.jhj.schedule.user.dto;
 
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.Authority;
+import com.jhj.schedule.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +19,11 @@ public class UserResponseDto {
     private String name;
     private String email;
     private String avatar;
+    private Authority authority;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static UserResponseDto from(UserEntity user) {
+    public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())
                 .name(user.getName())

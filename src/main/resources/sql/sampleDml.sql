@@ -1,0 +1,3 @@
+insert into users (id, authority, avatar, created_at, email, name, password, updated_at)
+values (1, 'ROLE_USER', '', TO_TIMESTAMP('2026-04-17 15:45:24.619219','YYYY-MM-DD HH24:MI:SS.MS'), 'test@test.com', '홍길도', '$2a$10$7UivaNGymsJIKtEZwHQ7uuQaQX.x5M1xg73gPE8yKgTnB8cP.Df2q', TO_TIMESTAMP('2026-04-17 15:45:24.619219','YYYY-MM-DD HH24:MI:SS.MS')),
+       (2, 'ROLE_USER', '', TO_TIMESTAMP('2026-04-24 22:34:24.993032','YYYY-MM-DD HH24:MI:SS.MS'), 'test@test.com', '홍길도', '$2a$10$nSwnQ9hnkGY2imr3jgN0zefs4wikfK35YjWBQgrVM0aKgMX94yahu', TO_TIMESTAMP('2026-04-24 22:34:24.993032','YYYY-MM-DD HH24:MI:SS.MS'));

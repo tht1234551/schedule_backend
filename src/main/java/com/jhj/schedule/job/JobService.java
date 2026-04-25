@@ -6,7 +6,7 @@ import com.jhj.schedule.job.dto.JobRequestDto;
 import com.jhj.schedule.job.dto.JobResponseDto;
 import com.jhj.schedule.job.exception.InvalidJobPeriodException;
 import com.jhj.schedule.job.exception.JobNotFoundException;
-import com.jhj.schedule.user.UserEntity;
+import com.jhj.schedule.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +20,9 @@ public class JobService {
     private final JobRepository jobRepository;
 
     @Transactional(readOnly = true)
-    public List<JobResponseDto> findPersonalJobs(UserEntity userEntity, JobRangeRequestDto request) {
+    public List<JobResponseDto> findPersonalJobs(User user, JobRangeRequestDto request) {
         return jobRepository
-                .findOverlappingJobs(userEntity, request.getStartDate(), request.getEndDate())
+                .findOverlappingJobs(user.getId(), request.getStartDate(), request.getEndDate())
                 .stream()
                 .map(JobResponseDto::from)
                 .toList();
@@ -37,10 +37,10 @@ public class JobService {
     }
 
     @Transactional
-    public JobResponseDto modifyJob(Long jobId, UserEntity user, JobRequestDto request) {
+    public JobResponseDto modifyJob(Long jobId, User user, JobRequestDto request) {
         validatePeriod(request.getStartDateTime(), request.getEndDateTime());
 
-        JobEntity job = jobRepository.findByIdAndUser(jobId, user)
+        JobEntity job = jobRepository.findByIdAndUserId(jobId, user.getId())
                 .orElseThrow(JobNotFoundException::new);
 
         job.update(
@@ -52,14 +52,14 @@ public class JobService {
                 request.getOpenType()
         );
 
-        return JobResponseDto.from(job);
+        return JobResponseDto.from(jobRepository.save(job));
     }
 
     @Transactional
-    public void deleteJob(Long jobId, UserEntity user) {
-        JobEntity job = jobRepository.findByIdAndUser(jobId, user)
+    public void deleteJob(Long jobId, User user) {
+        JobEntity job = jobRepository.findByIdAndUserId(jobId, user.getId())
                 .orElseThrow(JobNotFoundException::new);
-        jobRepository.delete(job);
+        jobRepository.delete(job.getId());
     }
 
 
