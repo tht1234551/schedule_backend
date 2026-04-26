@@ -1,0 +1,10 @@
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.boot.autoconfigure.security: INFO
+    org.jooq.tools.LoggerListener: INFO
+
+jwt:
+  expiration:
+    access: 3600000 # 한시간
+    refresh: 86400000 # 하루
