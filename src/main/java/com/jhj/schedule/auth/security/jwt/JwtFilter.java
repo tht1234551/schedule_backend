@@ -1,6 +1,7 @@
 package com.jhj.schedule.auth.security.jwt;
 
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
+import com.jhj.schedule.user.application.UserService;
 import com.jhj.schedule.user.domain.Authority;
 import com.jhj.schedule.user.domain.User;
 import jakarta.servlet.FilterChain;
@@ -14,11 +15,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
 
     // TODO: 정리
@@ -50,16 +53,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // JWT에서 사용자 정보 추출
             String email = jwtUtil.getEmail(token);
-            String role = jwtUtil.getData(token, "role");
-            Long id = jwtUtil.getId(token);
+
+            User user = userService.findByEmail(email);
 
             // 인증 객체 생성
-            User user = User.builder()
-                    .id(id)
-                    .email(email)
-                    .password(null)
-                    .authority(Authority.valueOf(role))
-                    .build();
+//            User user = User.builder()
+//                    .id(id)
+//                    .email(email)
+//                    .password(null)
+//                    .authority(Authority.valueOf(role))
+//                    .build();
 
             CustomUserDetail customUserDetails = new CustomUserDetail(user);
             Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

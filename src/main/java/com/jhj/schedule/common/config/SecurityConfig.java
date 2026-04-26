@@ -6,6 +6,7 @@ import com.jhj.schedule.auth.security.jwt.JwtUtil;
 import com.jhj.schedule.auth.security.jwt.LoginFilter;
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetailService;
 import com.jhj.schedule.common.util.ActiveProfileUtil;
+import com.jhj.schedule.user.application.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,7 @@ public class SecurityConfig {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
     private final ActiveProfileUtil activeProfileUtil;
+    private final UserService userService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
@@ -84,7 +86,7 @@ public class SecurityConfig {
         loginFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         http
-                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
 

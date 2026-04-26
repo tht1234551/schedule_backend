@@ -51,8 +51,7 @@ public class AuthService {
             throw new RuntimeException("refresh token expired");
         }
 
-        User user = userService.findById(tokenEntity.getUserId())
-                .orElseThrow(() -> new RuntimeException("invalid refresh token"));
+        User user = userService.findById(tokenEntity.getUserId());
 
         String email = jwtUtil.getEmail(refreshToken);
         String role = user.getAuthority().name();
