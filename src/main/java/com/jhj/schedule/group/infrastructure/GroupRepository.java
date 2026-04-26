@@ -1,6 +1,7 @@
 package com.jhj.schedule.group.infrastructure;
 
 import com.jhj.schedule.group.domain.Group;
+import com.jhj.schedule.group.domain.GroupMemberStatus;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -23,13 +24,33 @@ public class GroupRepository {
         return dsl.select(GROUPS.ID, GROUPS.GROUP_NAME)
                 .from(GROUPS)
                 .join(GROUP_MEMBERS).on(GROUP_MEMBERS.GROUP_ID.eq(GROUPS.ID))
-                .where(GROUP_MEMBERS.USER_ID.eq(userId))
+                .where(
+                        GROUP_MEMBERS.USER_ID.eq(userId)
+                                .and(GROUP_MEMBERS.STATUS.eq(GroupMemberStatus.JOINED.name()))
+                )
                 .fetch()
                 .map(r -> new GroupSummaryResponseDto(
                         r.get(GROUPS.ID),
                         r.get(GROUPS.GROUP_NAME)
                 ));
     }
+
+    public List<GroupSummaryResponseDto> findMyInvitationsGroups(Long userId) {
+        return dsl.select(GROUPS.ID, GROUPS.GROUP_NAME)
+                .from(GROUPS)
+                .join(GROUP_MEMBERS).on(GROUP_MEMBERS.GROUP_ID.eq(GROUPS.ID))
+                .where(
+                        GROUP_MEMBERS.USER_ID.eq(userId)
+                                .and(GROUP_MEMBERS.STATUS.eq(GroupMemberStatus.PENDING.name()))
+                )
+                .fetch()
+                .map(r -> new GroupSummaryResponseDto(
+                        r.get(GROUPS.ID),
+                        r.get(GROUPS.GROUP_NAME)
+                ));
+    }
+
+
 
     public Optional<Group> findById(Long id) {
         return dsl.selectFrom(GROUPS)

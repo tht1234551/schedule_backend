@@ -7,7 +7,9 @@ import com.jhj.schedule.user.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping( "/api/v1/users")
@@ -25,35 +27,6 @@ public class UserController {
         UserResponseDto result = UserResponseDto.from(user);
 
         return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/me/invitations")
-    public ResponseEntity<UserResponseDto> invitations(
-            @AuthenticationPrincipal CustomUserDetail userDetail
-    ) {
-        User jwtUser = userDetail.getUser();
-
-        return ResponseEntity.ok(null);
-    }
-
-    @PostMapping("/me/invitations/{invitationId}/accept")
-    public ResponseEntity<UserResponseDto> invitationsAccept(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
-            @PathVariable Long invitationId
-    ) {
-        User jwtUser = userDetail.getUser();
-
-        return ResponseEntity.ok(null);
-    }
-
-    @PostMapping("/me/invitations/{invitationId}/decline")
-    public ResponseEntity<UserResponseDto> invitationsDecline(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
-            @PathVariable Long invitationId
-    ) {
-        User jwtUser = userDetail.getUser();
-
-        return ResponseEntity.ok(null);
     }
 
 }

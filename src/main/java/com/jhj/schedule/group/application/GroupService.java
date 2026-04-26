@@ -6,6 +6,7 @@ import com.jhj.schedule.group.domain.GroupMemberStatus;
 import com.jhj.schedule.group.domain.GroupRole;
 import com.jhj.schedule.group.dto.request.GroupMemberRequestDto;
 import com.jhj.schedule.group.dto.request.GroupRequestDto;
+import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.group.dto.response.GroupMemberResponseDto;
 import com.jhj.schedule.group.dto.response.GroupResponseDto;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
@@ -13,6 +14,7 @@ import com.jhj.schedule.group.exception.GroupErrorCode;
 import com.jhj.schedule.group.exception.MemberInvitationsException;
 import com.jhj.schedule.group.infrastructure.GroupMemberRepository;
 import com.jhj.schedule.group.infrastructure.GroupRepository;
+import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.user.domain.User;
 import com.jhj.schedule.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +33,10 @@ public class GroupService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<GroupSummaryResponseDto> findGroups(User user) {
+    public List<GroupSummaryResponseDto> findMyGroups(User user) {
         return groupRepository.findSummariesByUserId(user.getId());
     }
+
 
     // TODO: 초대처럼 중복처리같은 유효성 체크
     @Transactional
@@ -99,6 +102,12 @@ public class GroupService {
         checkDuplicate(invitations, members);
 
         groupMemberRepository.invite(inviter, groupId, invitations);
+        return null;
+    }
+
+    @Transactional
+    public List<GroupJobsResponseDto> findGroupJobs(User user, Long groupId, JobRangeRequestDto range) {
+
         return null;
     }
 

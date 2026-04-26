@@ -21,7 +21,7 @@ public class Job {
     private LocalDateTime endDate;
     private String hexColor;
     private String description;
-    private OpenType openType;
+    private ContentsPolicyType contentsPolicyType;
     private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -31,13 +31,13 @@ public class Job {
                        LocalDateTime endDate,
                        String hexColor,
                        String description,
-                       OpenType openType) {
+                       ContentsPolicyType contentsPolicyType) {
 
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
         this.hexColor = hexColor;
         this.description = description;
-        this.openType = openType;
+        this.contentsPolicyType = contentsPolicyType;
     }
 }

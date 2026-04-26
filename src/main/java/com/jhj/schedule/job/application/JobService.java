@@ -51,7 +51,7 @@ public class JobService {
                 request.getEndDateTime(),
                 request.getHexColor(),
                 request.getDescription(),
-                request.getOpenType()
+                request.getContentsPolicyType()
         );
 
         return JobResponseDto.from(jobRepository.save(job));

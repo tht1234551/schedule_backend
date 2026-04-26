@@ -1,7 +1,7 @@
 package com.jhj.schedule.job.dto;
 
 import com.jhj.schedule.job.domain.Job;
-import com.jhj.schedule.job.domain.OpenType;
+import com.jhj.schedule.job.domain.ContentsPolicyType;
 import com.jhj.schedule.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +27,7 @@ public class JobRequestDto {
 
     private String hexColor;
     private String description;
-    private OpenType openType;
+    private ContentsPolicyType contentsPolicyType;
 
     public Job toEntity(User user) {
         return Job.builder()
@@ -36,7 +36,7 @@ public class JobRequestDto {
                 .endDate(endDateTime)
                 .hexColor(hexColor)
                 .description(description)
-                .openType(openType)
+                .contentsPolicyType(contentsPolicyType)
                 .userId(user.getId())
                 .build();
     }

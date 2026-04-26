@@ -1,7 +1,7 @@
 package com.jhj.schedule.job.infrastructure;
 
 import com.jhj.schedule.job.domain.Job;
-import com.jhj.schedule.job.domain.OpenType;
+import com.jhj.schedule.job.domain.ContentsPolicyType;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -45,7 +45,7 @@ public class JobRepository {
                     .set(JOBS.END_DATE, job.getEndDate())
                     .set(JOBS.HEX_COLOR, job.getHexColor())
                     .set(JOBS.DESCRIPTION, job.getDescription())
-                    .set(JOBS.OPEN_TYPE, job.getOpenType() != null ? job.getOpenType().name() : null)
+                    .set(JOBS.OPEN_TYPE, job.getContentsPolicyType() != null ? job.getContentsPolicyType().name() : null)
                     .set(JOBS.USER_ID, job.getUserId())
                     .set(JOBS.CREATED_AT, now)
                     .set(JOBS.UPDATED_AT, now)
@@ -62,7 +62,7 @@ public class JobRepository {
                     .set(JOBS.END_DATE, job.getEndDate())
                     .set(JOBS.HEX_COLOR, job.getHexColor())
                     .set(JOBS.DESCRIPTION, job.getDescription())
-                    .set(JOBS.OPEN_TYPE, job.getOpenType() != null ? job.getOpenType().name() : null)
+                    .set(JOBS.OPEN_TYPE, job.getContentsPolicyType() != null ? job.getContentsPolicyType().name() : null)
                     .set(JOBS.UPDATED_AT, now)
                     .where(JOBS.ID.eq(job.getId()))
                     .execute();
@@ -83,7 +83,7 @@ public class JobRepository {
                 .endDate(r.get(JOBS.END_DATE))
                 .hexColor(r.get(JOBS.HEX_COLOR))
                 .description(r.get(JOBS.DESCRIPTION))
-                .openType(r.get(JOBS.OPEN_TYPE) != null ? OpenType.valueOf(r.get(JOBS.OPEN_TYPE)) : null)
+                .contentsPolicyType(r.get(JOBS.OPEN_TYPE) != null ? ContentsPolicyType.valueOf(r.get(JOBS.OPEN_TYPE)) : null)
                 .userId(r.get(JOBS.USER_ID))
                 .createdAt(r.get(JOBS.CREATED_AT))
                 .updatedAt(r.get(JOBS.UPDATED_AT))

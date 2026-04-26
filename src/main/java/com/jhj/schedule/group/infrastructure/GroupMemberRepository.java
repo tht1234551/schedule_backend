@@ -180,4 +180,71 @@ public class GroupMemberRepository {
                                 .build()
                 );
     }
+
+    public Optional<GroupMember> acceptInvitation(Long userId, Long groupId) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return dsl.update(GROUP_MEMBERS)
+                .set(GROUP_MEMBERS.STATUS, GroupMemberStatus.JOINED.name())
+                .set(GROUP_MEMBERS.UPDATED_AT, now)
+                .where(
+                        GROUP_MEMBERS.USER_ID.eq(userId)
+                                .and(GROUP_MEMBERS.GROUP_ID.eq(groupId))
+                                .and(GROUP_MEMBERS.STATUS.eq(GroupMemberStatus.PENDING.name()))
+                )
+                .returningResult(
+                        GROUP_MEMBERS.ID,
+                        GROUP_MEMBERS.GROUP_ID,
+                        GROUP_MEMBERS.USER_ID,
+                        GROUP_MEMBERS.USER_NAME,
+                        GROUP_MEMBERS.ROLE,
+                        GROUP_MEMBERS.STATUS,
+                        GROUP_MEMBERS.UPDATED_AT
+                )
+                .fetchOptional()
+                .map(r -> GroupMember.builder()
+                        .id(r.get(GROUP_MEMBERS.ID))
+                        .groupId(r.get(GROUP_MEMBERS.GROUP_ID))
+                        .userId(r.get(GROUP_MEMBERS.USER_ID))
+                        .userName(r.get(GROUP_MEMBERS.USER_NAME))
+                        .role(GroupRole.valueOf(r.get(GROUP_MEMBERS.ROLE)))
+                        .status(GroupMemberStatus.valueOf(r.get(GROUP_MEMBERS.STATUS)))
+                        .updatedAt(r.get(GROUP_MEMBERS.UPDATED_AT))
+                        .build()
+                );
+
+    }
+
+    public Optional<GroupMember> declineInvitation(Long userId, Long groupId) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return dsl.update(GROUP_MEMBERS)
+                .set(GROUP_MEMBERS.STATUS, GroupMemberStatus.DECLINED.name())
+                .set(GROUP_MEMBERS.UPDATED_AT, now)
+                .where(
+                        GROUP_MEMBERS.USER_ID.eq(userId)
+                                .and(GROUP_MEMBERS.GROUP_ID.eq(groupId))
+                                .and(GROUP_MEMBERS.STATUS.eq(GroupMemberStatus.PENDING.name()))
+                )
+                .returningResult(
+                        GROUP_MEMBERS.ID,
+                        GROUP_MEMBERS.GROUP_ID,
+                        GROUP_MEMBERS.USER_ID,
+                        GROUP_MEMBERS.USER_NAME,
+                        GROUP_MEMBERS.ROLE,
+                        GROUP_MEMBERS.STATUS,
+                        GROUP_MEMBERS.UPDATED_AT
+                )
+                .fetchOptional()
+                .map(r -> GroupMember.builder()
+                        .id(r.get(GROUP_MEMBERS.ID))
+                        .groupId(r.get(GROUP_MEMBERS.GROUP_ID))
+                        .userId(r.get(GROUP_MEMBERS.USER_ID))
+                        .userName(r.get(GROUP_MEMBERS.USER_NAME))
+                        .role(GroupRole.valueOf(r.get(GROUP_MEMBERS.ROLE)))
+                        .status(GroupMemberStatus.valueOf(r.get(GROUP_MEMBERS.STATUS)))
+                        .updatedAt(r.get(GROUP_MEMBERS.UPDATED_AT))
+                        .build()
+                );
+    }
 }
