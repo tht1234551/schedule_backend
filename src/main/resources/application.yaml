@@ -6,13 +6,23 @@ spring:
     name: schedule
   profiles:
     active: dev
+  h2:
+    console:
+      enabled: false
   jooq:
     sql-dialect: POSTGRES
+    logging:
+      enabled: true
 #  적용시 시큐리티가 junit 테스트 통과를 못함
 #  mvc:
 #    servlet:
 #      path: /api
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.boot.autoconfigure.security: DEBUG
+    org.jooq.tools.LoggerListener: DEBUG
 
 jwt:
   secret: ho0PCPYX5o5x0xNZhSGjkLgKMHLbsrPdX4plfRCWPf8=

@@ -1,12 +1,12 @@
 package com.jhj.schedule.common.config;
 
 import com.jhj.schedule.auth.infrastructure.RefreshTokenRepository;
-import com.jhj.schedule.auth.security.jwt.JwtUtil;
-import com.jhj.schedule.auth.security.userdetail.CustomUserDetailService;
 import com.jhj.schedule.auth.security.jwt.JwtFilter;
+import com.jhj.schedule.auth.security.jwt.JwtUtil;
 import com.jhj.schedule.auth.security.jwt.LoginFilter;
+import com.jhj.schedule.auth.security.userdetail.CustomUserDetailService;
+import com.jhj.schedule.common.util.ActiveProfileUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,7 +15,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,26 +36,41 @@ public class SecurityConfig {
     private final CustomUserDetailService customUserDetailService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
+    private final ActiveProfileUtil activeProfileUtil;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 프론트 CORS 헤더 세팅
                 .csrf(CsrfConfigurer::disable) // REST API라면 비활성화
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
+                .authorizeHttpRequests(auth -> {
+                    if (activeProfileUtil.isProd()) {
+                        auth.requestMatchers(
+                                "/api/auth/**",
+                                "/error",
+                                "/favicon.ico"
+                        ).permitAll();
+                    } else {
+                        auth.requestMatchers(
                                 "/api/hello2",
                                 "/api/hello3",
                                 "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/swagger-resources/**"
-                        ).permitAll()  // 인증 없이 접근 허용
-                        .requestMatchers(PathRequest.toH2Console()).permitAll() // h2db 콘솔
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight 허용
-                        .anyRequest().authenticated()                   // 나머지는 인증 필요
-                )
+                                "/swagger-resources/**",
+                                "/h2-console/**",
+                                "/error",
+                                "/favicon.ico"
+                        ).permitAll();
+                    }
+
+                    auth
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight 허용
+                            .anyRequest().authenticated();                   // 나머지는 인증 필요
+
+                })
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT 사용 시
                 )
@@ -70,7 +84,6 @@ public class SecurityConfig {
         loginFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         http
-                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -124,9 +137,9 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers("/error", "/favicon.ico");
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring()
+//                .requestMatchers("/error", "/favicon.ico");
+//    }
 }

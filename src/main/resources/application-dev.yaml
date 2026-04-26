@@ -4,8 +4,3 @@ spring:
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
-
-logging:
-  level:
-    org.springframework.security: DEBUG
-    org.springframework.boot.autoconfigure.security: DEBUG
