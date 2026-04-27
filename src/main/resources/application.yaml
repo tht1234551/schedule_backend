@@ -20,11 +20,24 @@ spring:
 #    servlet:
 #      path: /api
 
+
 logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.boot.autoconfigure.security: DEBUG
     org.jooq.tools.LoggerListener: DEBUG
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
 
 jwt:
   secret: ho0PCPYX5o5x0xNZhSGjkLgKMHLbsrPdX4plfRCWPf8=

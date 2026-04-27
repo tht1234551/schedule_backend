@@ -16,6 +16,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -47,14 +48,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 프론트 CORS 헤더 세팅
                 .csrf(CsrfConfigurer::disable) // REST API라면 비활성화
                 .authorizeHttpRequests(auth -> {
-                    if (activeProfileUtil.isProd()) {
+                    auth.requestMatchers(
+                            "/api/auth/**",
+                            "/actuator",
+                            "/actuator/health",
+                            "/error",
+                            "/favicon.ico"
+                    ).permitAll();
+
+                    if (!activeProfileUtil.isProd()) {
                         auth.requestMatchers(
-                                "/api/auth/**",
-                                "/error",
-                                "/favicon.ico"
-                        ).permitAll();
-                    } else {
-                        auth.requestMatchers(
+                                "/actuator",
                                 "/api/hello2",
                                 "/api/hello3",
                                 "/api/auth/**",
@@ -62,9 +66,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/h2-console/**",
-                                "/error",
-                                "/favicon.ico"
+                                "/h2-console/**"
                         ).permitAll();
                     }
 
