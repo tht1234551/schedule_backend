@@ -7,6 +7,7 @@ import com.jhj.schedule.group.dto.request.GroupMemberRequestDto;
 import com.jhj.schedule.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -202,17 +203,7 @@ public class GroupMemberRepository {
                         GROUP_MEMBERS.UPDATED_AT
                 )
                 .fetchOptional()
-                .map(r -> GroupMember.builder()
-                        .id(r.get(GROUP_MEMBERS.ID))
-                        .groupId(r.get(GROUP_MEMBERS.GROUP_ID))
-                        .userId(r.get(GROUP_MEMBERS.USER_ID))
-                        .userName(r.get(GROUP_MEMBERS.USER_NAME))
-                        .role(GroupRole.valueOf(r.get(GROUP_MEMBERS.ROLE)))
-                        .status(GroupMemberStatus.valueOf(r.get(GROUP_MEMBERS.STATUS)))
-                        .updatedAt(r.get(GROUP_MEMBERS.UPDATED_AT))
-                        .build()
-                );
-
+                .map(this::toDomain);
     }
 
     public Optional<GroupMember> declineInvitation(Long userId, Long groupId) {
@@ -236,15 +227,19 @@ public class GroupMemberRepository {
                         GROUP_MEMBERS.UPDATED_AT
                 )
                 .fetchOptional()
-                .map(r -> GroupMember.builder()
-                        .id(r.get(GROUP_MEMBERS.ID))
-                        .groupId(r.get(GROUP_MEMBERS.GROUP_ID))
-                        .userId(r.get(GROUP_MEMBERS.USER_ID))
-                        .userName(r.get(GROUP_MEMBERS.USER_NAME))
-                        .role(GroupRole.valueOf(r.get(GROUP_MEMBERS.ROLE)))
-                        .status(GroupMemberStatus.valueOf(r.get(GROUP_MEMBERS.STATUS)))
-                        .updatedAt(r.get(GROUP_MEMBERS.UPDATED_AT))
-                        .build()
-                );
+                .map(this::toDomain);
+    }
+
+    private GroupMember toDomain(Record r) {
+        return GroupMember.builder()
+                .id(r.get(GROUP_MEMBERS.ID))
+                .groupId(r.get(GROUP_MEMBERS.GROUP_ID))
+                .userId(r.get(GROUP_MEMBERS.USER_ID))
+                .userName(r.get(GROUP_MEMBERS.USER_NAME))
+                .role(GroupRole.valueOf(r.get(GROUP_MEMBERS.ROLE)))
+                .status(GroupMemberStatus.valueOf(r.get(GROUP_MEMBERS.STATUS)))
+                .updatedAt(r.get(GROUP_MEMBERS.UPDATED_AT))
+                .build()
+        ;
     }
 }

@@ -1,5 +1,6 @@
 package com.jhj.schedule.job.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -21,10 +22,12 @@ public class JobRangeRequestDto {
     @Max(12)
     private int month;
 
+    @JsonIgnore
     public LocalDateTime getStartDate() {
         return LocalDateTime.of(year, month, 1, 0, 0);
     }
 
+    @JsonIgnore
     public LocalDateTime getEndDate() {
         return LocalDateTime.of(year, month, 1, 0, 0)
                 .plusMonths(1);

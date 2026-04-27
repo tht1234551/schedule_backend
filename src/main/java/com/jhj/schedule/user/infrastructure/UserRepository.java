@@ -5,6 +5,7 @@ import com.jhj.schedule.user.domain.Authority;
 import com.jhj.schedule.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -75,16 +76,16 @@ public class UserRepository {
         return user;
     }
 
-    private static User toDomain(UsersRecord record) {
+    private static User toDomain(Record r) {
         return User.builder()
-                .id(record.getId())
-                .name(record.getName())
-                .email(record.getEmail())
-                .password(record.getPassword())
-                .authority(Authority.valueOf(record.getAuthority()))
-                .avatar(record.getAvatar())
-                .updatedAt(record.getUpdatedAt())
-                .createdAt(record.getCreatedAt())
+                .id(r.get(USERS.ID))
+                .name(r.get(USERS.NAME))
+                .email(r.get(USERS.EMAIL))
+                .password(r.get(USERS.PASSWORD))
+                .authority(Authority.valueOf(r.get(USERS.AUTHORITY)))
+                .avatar(r.get(USERS.AVATAR))
+                .createdAt(r.get(USERS.CREATED_AT))
+                .updatedAt(r.get(USERS.UPDATED_AT))
                 .build();
     }
 }

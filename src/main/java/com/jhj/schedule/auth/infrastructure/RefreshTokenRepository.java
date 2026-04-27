@@ -22,7 +22,7 @@ public class RefreshTokenRepository {
         return dsl.selectFrom(REFRESH_TOKENS)
                 .where(REFRESH_TOKENS.TOKEN.eq(token))
                 .fetchOptional()
-                .map(this::toEntity);
+                .map(this::toDomain);
     }
 
     public void deleteByUserId(Long userId) {
@@ -57,7 +57,7 @@ public class RefreshTokenRepository {
         return refreshToken;
     }
 
-    private RefreshToken toEntity(Record r) {
+    private RefreshToken toDomain(Record r) {
         return RefreshToken.builder()
                 .id(r.get(REFRESH_TOKENS.ID))
                 .userId(r.get(REFRESH_TOKENS.USER_ID))

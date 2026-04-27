@@ -22,8 +22,8 @@ public class JobController {
 
     private final JobService jobService;
 
-    @GetMapping("/personal")
-    ResponseEntity<List<JobResponseDto>> personal(
+    @GetMapping
+    ResponseEntity<List<JobResponseDto>> getMyJobs(
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @Valid @ModelAttribute JobRangeRequestDto request) {
         List<JobResponseDto> personalJobs = jobService.findPersonalJobs(userDetail.getUser(), request);

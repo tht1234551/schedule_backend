@@ -44,14 +44,14 @@ public class AuthService {
             throw new RuntimeException("invalid refresh token");
         }
 
-        RefreshToken tokenEntity = refreshTokenRepository.findByToken(refreshToken)
+        RefreshToken refreshTokenDomain = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new RuntimeException("invalid refresh token"));
 
-        if (tokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (refreshTokenDomain.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("refresh token expired");
         }
 
-        User user = userService.findById(tokenEntity.getUserId());
+        User user = userService.findById(refreshTokenDomain.getUserId());
 
         String email = jwtUtil.getEmail(refreshToken);
         String role = user.getAuthority().name();

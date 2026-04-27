@@ -22,8 +22,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> me(
             @AuthenticationPrincipal CustomUserDetail userDetail
     ) {
-        User jwtUser = userDetail.getUser();
-        User user = userService.findByEmail(jwtUser.getEmail());
+        User user = userDetail.getUser();
         UserResponseDto result = UserResponseDto.from(user);
 
         return ResponseEntity.ok(result);
