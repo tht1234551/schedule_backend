@@ -54,9 +54,10 @@ public class JwtFilter extends OncePerRequestFilter {
             // JWT에서 사용자 정보 추출
             String email = jwtUtil.getEmail(token);
 
+            // redis 유저
             User user = userService.findByEmail(email);
 
-            // 인증 객체 생성
+            // jwt 유저
 //            User user = User.builder()
 //                    .id(id)
 //                    .email(email)
