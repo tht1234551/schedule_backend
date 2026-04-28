@@ -32,7 +32,8 @@ public class JobService {
     }
 
     @Transactional
-    public JobResponseDto saveJob(Job job) {
+    public JobResponseDto saveJob(User user, JobRequestDto requestDto) {
+        Job job = requestDto.toEntity(user);
         validatePeriod(job.getStartDate(), job.getEndDate());
 
         Job save = jobRepository.insert(job);
@@ -66,8 +67,8 @@ public class JobService {
     }
 
     @Transactional(readOnly = true)
-    public GroupJobsResponseDto findJobsByGroup(User user, Long groupId, JobRangeRequestDto range) {
-        List<Job> jobs = jobRepository.findJobsByGroup(user.getId(), groupId, range);
+    public GroupJobsResponseDto findGroupJobs(User user, Long groupId, JobRangeRequestDto range) {
+        List<Job> jobs = jobRepository.findGroupJobs(user.getId(), groupId, range);
         List<JobResponseDto> jobResponses = jobs.stream().map(JobResponseDto::from).toList();
 
         return GroupJobsResponseDto.builder()

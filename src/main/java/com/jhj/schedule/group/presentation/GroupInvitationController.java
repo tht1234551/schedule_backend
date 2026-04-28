@@ -24,7 +24,7 @@ public class GroupInvitationController {
 
     @GetMapping("/invitations")
     public ResponseEntity<List<GroupSummaryResponseDto>> getMyInvitations(
-            @AuthenticationPrincipal CustomUserDetail userDetail
+            @CurrentUser User user
     ) {
         User user = userDetail.getUser();
         List<GroupSummaryResponseDto> invitations = groupInvitationService.findMyInvitationsGroups(user);
@@ -34,7 +34,7 @@ public class GroupInvitationController {
 
     @PostMapping("/{groupId}/invitations")
     public ResponseEntity<List<GroupMemberResponseDto>> inviteMembers(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @PathVariable Long groupId,
             @Valid @RequestBody GroupInviteRequestDto dto
     ) {
@@ -46,7 +46,7 @@ public class GroupInvitationController {
 
     @PostMapping("/{groupId}/invitations/accept")
     public ResponseEntity<GroupMemberResponseDto> acceptInvitation(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @PathVariable Long groupId
     ) {
         User user = userDetail.getUser();
@@ -57,7 +57,7 @@ public class GroupInvitationController {
 
     @PostMapping("/{groupId}/invitations/decline")
     public ResponseEntity<GroupMemberResponseDto> declineInvitation(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @PathVariable Long groupId
     ) {
         User user = userDetail.getUser();

@@ -1,11 +1,10 @@
 package com.jhj.schedule.group.presentation;
 
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
+import com.jhj.schedule.common.annotation.CurrentUser;
 import com.jhj.schedule.group.application.GroupService;
-import com.jhj.schedule.group.dto.request.GroupInviteRequestDto;
 import com.jhj.schedule.group.dto.request.GroupRequestDto;
 import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
-import com.jhj.schedule.group.dto.response.GroupMemberResponseDto;
 import com.jhj.schedule.group.dto.response.GroupResponseDto;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
 import com.jhj.schedule.job.application.JobService;
@@ -30,9 +29,8 @@ public class GroupController {
 
     @GetMapping
     ResponseEntity<List<GroupSummaryResponseDto>> getMyGroups(
-            @AuthenticationPrincipal CustomUserDetail userDetail
+            @CurrentUser User user
     ) {
-        User user = userDetail.getUser();
         List<GroupSummaryResponseDto> groups = groupService.findMyGroups(user);
 
         return ResponseEntity.ok(groups);
@@ -40,10 +38,9 @@ public class GroupController {
 
     @PostMapping
     public ResponseEntity<GroupResponseDto> createGroup(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @RequestBody GroupRequestDto dto
     ) {
-        User user = userDetail.getUser();
         GroupResponseDto groupResponseDto = groupService.createGroup(user, dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(groupResponseDto);
@@ -56,12 +53,11 @@ public class GroupController {
      */
     @GetMapping("/{groupId}/jobs")
     public ResponseEntity<GroupJobsResponseDto> getGroupJobs(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @PathVariable Long groupId,
             @Valid @ModelAttribute JobRangeRequestDto range
     ) {
-        User user = userDetail.getUser();
-        GroupJobsResponseDto groupJobs = jobService.findJobsByGroup(user, groupId, range);
+        GroupJobsResponseDto groupJobs = jobService.findGroupJobs(user, groupId, range);
 
         return ResponseEntity.ok(groupJobs);
     }

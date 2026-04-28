@@ -20,7 +20,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> me(
-            @AuthenticationPrincipal CustomUserDetail userDetail
+            @CurrentUser User user
     ) {
         User user = userDetail.getUser();
         UserResponseDto result = UserResponseDto.from(user);

@@ -1,6 +1,7 @@
 package com.jhj.schedule.job.presentation;
 
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
+import com.jhj.schedule.common.annotation.CurrentUser;
 import com.jhj.schedule.job.application.JobService;
 import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.job.dto.JobRequestDto;
@@ -24,29 +25,27 @@ public class JobController {
 
     @GetMapping
     ResponseEntity<List<JobResponseDto>> getMyJobs(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @Valid @ModelAttribute JobRangeRequestDto request) {
-        List<JobResponseDto> personalJobs = jobService.findPersonalJobs(userDetail.getUser(), request);
+        List<JobResponseDto> personalJobs = jobService.findPersonalJobs(user, request);
         return ResponseEntity.ok(personalJobs);
     }
 
     @PostMapping
     ResponseEntity<JobResponseDto> addJob(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @Valid @RequestBody JobRequestDto request) {
-        User user = userDetail.getUser();
-        JobResponseDto jobResponseDto = jobService.saveJob(request.toEntity(user));
+        JobResponseDto jobResponseDto = jobService.saveJob(user, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(jobResponseDto);
     }
 
     @PutMapping("/{jobId}")
     public ResponseEntity<JobResponseDto> modify(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @PathVariable Long jobId,
             @Valid @RequestBody JobRequestDto request
     ) {
-        User user = userDetail.getUser();
         JobResponseDto response = jobService.modifyJob(jobId, user, request);
 
         return ResponseEntity.ok(response);
@@ -54,10 +53,9 @@ public class JobController {
 
     @DeleteMapping("/{jobId}")
     public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @CurrentUser User user,
             @PathVariable Long jobId
     ) {
-        User user = userDetail.getUser();
         jobService.deleteJob(jobId, user);
 
         return ResponseEntity.noContent().build();

@@ -40,7 +40,7 @@ public class JobRepository {
                 .map(this::toDomain);
     }
 
-    public List<Job> findJobsByGroup(Long userId, Long groupId, JobRangeRequestDto range) {
+    public List<Job> findGroupJobs(Long userId, Long groupId, JobRangeRequestDto range) {
         return dsl.select(
                 JOBS.ID,
                 JOBS.USER_ID,

@@ -85,7 +85,7 @@ class GroupControllerTest {
                 ))
                 .build();
 
-        given(jobService.findJobsByGroup(any(User.class), eq(groupId), any(JobRangeRequestDto.class)))
+        given(jobService.findGroupJobs(any(User.class), eq(groupId), any(JobRangeRequestDto.class)))
                 .willReturn(response);
 
         // when & then
@@ -97,7 +97,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$[0].groupId").value(groupId))
                 .andExpect(jsonPath("$[0].jobs[0].id").value(100));
 
-        verify(jobService).findJobsByGroup(any(User.class), eq(groupId), any(JobRangeRequestDto.class));
+        verify(jobService).findGroupJobs(any(User.class), eq(groupId), any(JobRangeRequestDto.class));
     }
 
 //    @Test
