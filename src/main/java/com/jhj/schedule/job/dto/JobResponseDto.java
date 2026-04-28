@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 public class JobResponseDto {
     private Long id;
+    private Long userId;
     private String title;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
@@ -23,6 +24,7 @@ public class JobResponseDto {
     public static JobResponseDto from(Job job) {
         return JobResponseDto.builder()
                 .id(job.getId())
+                .userId(job.getUserId())
                 .title(job.getTitle())
                 .startDateTime(job.getStartDate())
                 .endDateTime(job.getEndDate())

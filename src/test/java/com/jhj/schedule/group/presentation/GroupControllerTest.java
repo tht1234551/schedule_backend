@@ -3,6 +3,7 @@ package com.jhj.schedule.group.presentation;
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
 import com.jhj.schedule.group.application.GroupService;
 import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
+import com.jhj.schedule.job.application.JobService;
 import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.job.dto.JobResponseDto;
 import com.jhj.schedule.user.domain.Authority;
@@ -38,6 +39,9 @@ class GroupControllerTest {
 
     @Mock
     private GroupService groupService;
+
+    @Mock
+    private JobService jobService;
 
     private MockMvc mockMvc;
 
@@ -81,8 +85,8 @@ class GroupControllerTest {
                 ))
                 .build();
 
-        given(groupService.findGroupJobs(any(User.class), eq(groupId), any(JobRangeRequestDto.class)))
-                .willReturn(List.of(response));
+        given(jobService.findJobsByGroup(any(User.class), eq(groupId), any(JobRangeRequestDto.class)))
+                .willReturn(response);
 
         // when & then
         mockMvc.perform(get("/api/v1/groups/" + groupId + "/jobs")
@@ -93,7 +97,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$[0].groupId").value(groupId))
                 .andExpect(jsonPath("$[0].jobs[0].id").value(100));
 
-        verify(groupService).findGroupJobs(any(User.class), eq(groupId), any(JobRangeRequestDto.class));
+        verify(jobService).findJobsByGroup(any(User.class), eq(groupId), any(JobRangeRequestDto.class));
     }
 
 //    @Test

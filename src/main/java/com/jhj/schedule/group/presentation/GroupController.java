@@ -8,6 +8,7 @@ import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.group.dto.response.GroupMemberResponseDto;
 import com.jhj.schedule.group.dto.response.GroupResponseDto;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
+import com.jhj.schedule.job.application.JobService;
 import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.user.domain.User;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
+    private final JobService jobService;
 
     @GetMapping
     ResponseEntity<List<GroupSummaryResponseDto>> getMyGroups(
@@ -47,29 +49,19 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(groupResponseDto);
     }
 
-    @PostMapping("/{groupId}/invitations")
-    public ResponseEntity<List<GroupMemberResponseDto>> inviteMembers(
-            @AuthenticationPrincipal CustomUserDetail userDetail,
-            @PathVariable Long groupId,
-            @Valid @RequestBody GroupInviteRequestDto dto
-    ) {
-        User inviter = userDetail.getUser();
-        List<GroupMemberResponseDto> created = groupService.invite(inviter, groupId, dto.getInvitations());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
 
     /**
      * 특정 달에 그룹과 그룹원의 일정을 조회한다
      */
     @GetMapping("/{groupId}/jobs")
-    public ResponseEntity<List<GroupJobsResponseDto>> getGroupJobs(
+    public ResponseEntity<GroupJobsResponseDto> getGroupJobs(
             @AuthenticationPrincipal CustomUserDetail userDetail,
             @PathVariable Long groupId,
             @Valid @ModelAttribute JobRangeRequestDto range
     ) {
         User user = userDetail.getUser();
-        List<GroupJobsResponseDto> groupJobs = groupService.findGroupJobs(user, groupId, range);
+        GroupJobsResponseDto groupJobs = jobService.findJobsByGroup(user, groupId, range);
 
         return ResponseEntity.ok(groupJobs);
     }

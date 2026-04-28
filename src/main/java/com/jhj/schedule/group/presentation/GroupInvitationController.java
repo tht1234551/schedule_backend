@@ -2,17 +2,16 @@ package com.jhj.schedule.group.presentation;
 
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
 import com.jhj.schedule.group.application.GroupInvitationService;
+import com.jhj.schedule.group.dto.request.GroupInviteRequestDto;
 import com.jhj.schedule.group.dto.response.GroupMemberResponseDto;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
 import com.jhj.schedule.user.domain.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,6 +30,18 @@ public class GroupInvitationController {
         List<GroupSummaryResponseDto> invitations = groupInvitationService.findMyInvitationsGroups(user);
 
         return ResponseEntity.ok(invitations);
+    }
+
+    @PostMapping("/{groupId}/invitations")
+    public ResponseEntity<List<GroupMemberResponseDto>> inviteMembers(
+            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @PathVariable Long groupId,
+            @Valid @RequestBody GroupInviteRequestDto dto
+    ) {
+        User inviter = userDetail.getUser();
+        List<GroupMemberResponseDto> created = groupInvitationService.invite(inviter, groupId, dto.getInvitations());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PostMapping("/{groupId}/invitations/accept")

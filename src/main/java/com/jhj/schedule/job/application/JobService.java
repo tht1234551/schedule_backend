@@ -1,6 +1,7 @@
 package com.jhj.schedule.job.application;
 
 
+import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.job.domain.Job;
 import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.job.dto.JobRequestDto;
@@ -24,7 +25,7 @@ public class JobService {
     @Transactional(readOnly = true)
     public List<JobResponseDto> findPersonalJobs(User user, JobRangeRequestDto request) {
         return jobRepository
-                .findOverlappingJobs(user.getId(), request.getStartDate(), request.getEndDate())
+                .findOverlappingJobs(user.getId(), request)
                 .stream()
                 .map(JobResponseDto::from)
                 .toList();
@@ -34,7 +35,7 @@ public class JobService {
     public JobResponseDto saveJob(Job job) {
         validatePeriod(job.getStartDate(), job.getEndDate());
 
-        Job save = jobRepository.save(job);
+        Job save = jobRepository.insert(job);
         return JobResponseDto.from(save);
     }
 
@@ -54,7 +55,7 @@ public class JobService {
                 request.getContentsPolicyType()
         );
 
-        return JobResponseDto.from(jobRepository.save(job));
+        return JobResponseDto.from(jobRepository.insert(job));
     }
 
     @Transactional
@@ -64,6 +65,16 @@ public class JobService {
         jobRepository.delete(job.getId());
     }
 
+    @Transactional(readOnly = true)
+    public GroupJobsResponseDto findJobsByGroup(User user, Long groupId, JobRangeRequestDto range) {
+        List<Job> jobs = jobRepository.findJobsByGroup(user.getId(), groupId, range);
+        List<JobResponseDto> jobResponses = jobs.stream().map(JobResponseDto::from).toList();
+
+        return GroupJobsResponseDto.builder()
+                .groupId(groupId)
+                .jobs(jobResponses)
+                .build();
+    }
 
 
     private void validatePeriod(LocalDateTime start, LocalDateTime end) {
