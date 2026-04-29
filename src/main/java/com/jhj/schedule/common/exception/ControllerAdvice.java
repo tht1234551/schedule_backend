@@ -63,7 +63,7 @@ public class ControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleException(Exception e) {
-        if (!activeProfileUtil.isProd()) {
+        if (activeProfileUtil.isNotProd()) {
             e.printStackTrace();
         }
 

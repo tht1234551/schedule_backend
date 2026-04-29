@@ -16,6 +16,10 @@ public class ActiveProfileUtil {
         return Arrays.asList(environment.getActiveProfiles()).contains("prod");
     }
 
+    public boolean isNotProd() {
+        return !isProd();
+    }
+
     public boolean isDev() {
         return Arrays.asList(environment.getActiveProfiles()).contains("dev");
     }

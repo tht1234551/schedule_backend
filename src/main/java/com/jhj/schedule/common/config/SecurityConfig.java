@@ -56,7 +56,7 @@ public class SecurityConfig {
                             "/favicon.ico"
                     ).permitAll();
 
-                    if (!activeProfileUtil.isProd()) {
+                    if (activeProfileUtil.isNotProd()) {
                         auth.requestMatchers(
                                 "/actuator",
                                 "/api/hello2",
