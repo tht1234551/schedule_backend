@@ -1,6 +1,7 @@
 package com.jhj.schedule.group.presentation;
 
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
+import com.jhj.schedule.common.annotation.CurrentUser;
 import com.jhj.schedule.group.application.GroupInvitationService;
 import com.jhj.schedule.group.dto.request.GroupInviteRequestDto;
 import com.jhj.schedule.group.dto.response.GroupMemberResponseDto;
@@ -26,7 +27,6 @@ public class GroupInvitationController {
     public ResponseEntity<List<GroupSummaryResponseDto>> getMyInvitations(
             @CurrentUser User user
     ) {
-        User user = userDetail.getUser();
         List<GroupSummaryResponseDto> invitations = groupInvitationService.findMyInvitationsGroups(user);
 
         return ResponseEntity.ok(invitations);
@@ -38,8 +38,7 @@ public class GroupInvitationController {
             @PathVariable Long groupId,
             @Valid @RequestBody GroupInviteRequestDto dto
     ) {
-        User inviter = userDetail.getUser();
-        List<GroupMemberResponseDto> created = groupInvitationService.invite(inviter, groupId, dto.getInvitations());
+        List<GroupMemberResponseDto> created = groupInvitationService.invite(user, groupId, dto.getInvitations());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -49,7 +48,6 @@ public class GroupInvitationController {
             @CurrentUser User user,
             @PathVariable Long groupId
     ) {
-        User user = userDetail.getUser();
         GroupMemberResponseDto accepted = groupInvitationService.acceptInvitation(user, groupId);
 
         return ResponseEntity.ok(accepted);
@@ -60,7 +58,6 @@ public class GroupInvitationController {
             @CurrentUser User user,
             @PathVariable Long groupId
     ) {
-        User user = userDetail.getUser();
         GroupMemberResponseDto declined = groupInvitationService.declineInvitation(user, groupId);
 
         return ResponseEntity.ok(declined);
