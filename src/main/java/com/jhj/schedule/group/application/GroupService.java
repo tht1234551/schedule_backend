@@ -81,8 +81,7 @@ public class GroupService {
 
         groupMemberRepository.insertAll(members);
 
-        group.setMembers(members);
-        return GroupResponseDto.from(group);
+        return GroupResponseDto.from(group, members);
     }
 
 
