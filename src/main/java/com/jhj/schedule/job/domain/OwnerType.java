@@ -1,6 +1,6 @@
 package com.jhj.schedule.job.domain;
 
-public enum JobType {
+public enum OwnerType {
     GROUP,
     USER
 }

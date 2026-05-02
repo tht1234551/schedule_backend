@@ -1,8 +1,7 @@
 package com.jhj.schedule.job.dto;
 
-import com.jhj.schedule.job.domain.Job;
 import com.jhj.schedule.job.domain.ContentsPolicyType;
-import com.jhj.schedule.user.domain.User;
+import com.jhj.schedule.job.domain.OwnerType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -20,24 +19,16 @@ public class JobRequestDto {
     private String title;
 
     @NotNull(message = "시작일을 입력해주세요")
-    private LocalDateTime startDateTime;
+    private LocalDateTime startAt;
 
     @NotNull(message = "종료일을 입력해주세요")
-    private LocalDateTime endDateTime;
+    private LocalDateTime endAt;
+
+    @NotNull private OwnerType ownerType;
+
+    private Long groupId; // ownerType==GROUP 일 때만
 
     private String hexColor;
     private String description;
     private ContentsPolicyType contentsPolicyType;
-
-    public Job toEntity(User user) {
-        return Job.builder()
-                .title(title)
-                .startDate(startDateTime)
-                .endDate(endDateTime)
-                .hexColor(hexColor)
-                .description(description)
-                .contentsPolicyType(contentsPolicyType)
-                .userId(user.getId())
-                .build();
-    }
 }

@@ -1,10 +1,7 @@
 package com.jhj.schedule.job.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.jhj.schedule.job.exception.InvalidJobPeriodException;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -17,27 +14,24 @@ public class Job {
 
     private Long id;
     private String title;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
     private String hexColor;
     private String description;
     private ContentsPolicyType contentsPolicyType;
     private Long userId;
+    private OwnerType ownerType;
+    private Long groupId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public void update(String title,
-                       LocalDateTime startDate,
-                       LocalDateTime endDate,
-                       String hexColor,
-                       String description,
-                       ContentsPolicyType contentsPolicyType) {
+    public void validatePeriod() {
+        if (startAt == null || endAt == null) {
+            return;
+        }
 
-        this.title = title;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.hexColor = hexColor;
-        this.description = description;
-        this.contentsPolicyType = contentsPolicyType;
+        if (startAt.isAfter(endAt)) {
+            throw new InvalidJobPeriodException();
+        }
     }
 }

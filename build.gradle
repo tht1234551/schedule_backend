@@ -50,6 +50,9 @@ dependencies {
 
     // Swagger (springdoc-openapi)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
+    // JsonNullable
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.10'
 }
 
 tasks.named('test') {
@@ -89,6 +92,7 @@ jooq {
                         directory = 'build/main/generated'
                         encoding = "UTF-8"
                         locale = "kr"
+                        clean = true
                     }
                     strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
                 }

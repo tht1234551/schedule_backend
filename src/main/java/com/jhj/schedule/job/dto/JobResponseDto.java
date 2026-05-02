@@ -1,7 +1,8 @@
 package com.jhj.schedule.job.dto;
 
-import com.jhj.schedule.job.domain.Job;
 import com.jhj.schedule.job.domain.ContentsPolicyType;
+import com.jhj.schedule.job.domain.OwnerType;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,17 +21,6 @@ public class JobResponseDto {
     private ContentsPolicyType contentsPolicyType;
     private String hexColor;
     private String description;
-
-    public static JobResponseDto from(Job job) {
-        return JobResponseDto.builder()
-                .id(job.getId())
-                .userId(job.getUserId())
-                .title(job.getTitle())
-                .startDateTime(job.getStartDate())
-                .endDateTime(job.getEndDate())
-                .hexColor(job.getHexColor())
-                .description(job.getDescription())
-                .contentsPolicyType(job.getContentsPolicyType())
-                .build();
-    }
+    private OwnerType ownerType;
+    private Long groupId;
 }
