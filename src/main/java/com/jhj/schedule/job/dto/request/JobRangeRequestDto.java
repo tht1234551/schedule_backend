@@ -1,4 +1,4 @@
-package com.jhj.schedule.job.dto;
+package com.jhj.schedule.job.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Max;

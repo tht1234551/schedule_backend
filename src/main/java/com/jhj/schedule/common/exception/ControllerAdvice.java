@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -52,6 +53,22 @@ public class ControllerAdvice {
     public ResponseEntity<ProblemDetail> handleCustomException(CustomRuntimeException e) {
         HttpStatus status = e.getBaseErrorCode().getStatus();
         String message = e.getMessage();
+
+        ProblemDetail problem = ProblemDetail.forStatus(status);
+        problem.setDetail(message);
+
+        return ResponseEntity
+                .status(status)
+                .body(problem);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ProblemDetail> handleCustomException(MethodArgumentNotValidException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String message = e.getBindingResult()
+                .getAllErrors()
+                .get(0)
+                .getDefaultMessage();
 
         ProblemDetail problem = ProblemDetail.forStatus(status);
         problem.setDetail(message);

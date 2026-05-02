@@ -2,10 +2,10 @@ package com.jhj.schedule.job.presentation;
 
 import com.jhj.schedule.common.annotation.CurrentUser;
 import com.jhj.schedule.job.application.JobService;
-import com.jhj.schedule.job.dto.JobRangeRequestDto;
-import com.jhj.schedule.job.dto.JobRequestDto;
-import com.jhj.schedule.job.dto.JobResponseDto;
-import com.jhj.schedule.job.dto.JobUpdateRequestDto;
+import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
+import com.jhj.schedule.job.dto.request.JobCreateRequestDto;
+import com.jhj.schedule.job.dto.response.JobResponseDto;
+import com.jhj.schedule.job.dto.request.JobUpdateRequestDto;
 import com.jhj.schedule.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class JobController {
     @PostMapping
     ResponseEntity<JobResponseDto> addJob(
             @CurrentUser User user,
-            @Valid @RequestBody JobRequestDto request) {
+            @Valid @RequestBody JobCreateRequestDto request) {
         JobResponseDto jobResponseDto = jobService.save(user, request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(jobResponseDto);
@@ -43,7 +43,7 @@ public class JobController {
     public ResponseEntity<JobResponseDto> modify(
             @CurrentUser User user,
             @PathVariable Long jobId,
-            @RequestBody JobUpdateRequestDto request
+            @Valid @RequestBody JobUpdateRequestDto request
     ) {
         JobResponseDto response = jobService.modify(jobId, user, request);
 

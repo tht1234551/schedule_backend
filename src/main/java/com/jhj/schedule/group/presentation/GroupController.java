@@ -1,6 +1,5 @@
 package com.jhj.schedule.group.presentation;
 
-import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
 import com.jhj.schedule.common.annotation.CurrentUser;
 import com.jhj.schedule.group.application.GroupService;
 import com.jhj.schedule.group.dto.request.GroupRequestDto;
@@ -8,13 +7,12 @@ import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.group.dto.response.GroupResponseDto;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
 import com.jhj.schedule.job.application.JobService;
-import com.jhj.schedule.job.dto.JobRangeRequestDto;
+import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
 import com.jhj.schedule.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

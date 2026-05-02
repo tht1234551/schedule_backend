@@ -1,6 +1,6 @@
 package com.jhj.schedule.group.dto.response;
 
-import com.jhj.schedule.job.dto.JobResponseDto;
+import com.jhj.schedule.job.dto.response.JobResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 

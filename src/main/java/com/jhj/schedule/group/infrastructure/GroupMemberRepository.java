@@ -4,7 +4,6 @@ import com.jhj.schedule.group.domain.GroupMember;
 import com.jhj.schedule.group.domain.GroupMemberStatus;
 import com.jhj.schedule.group.domain.GroupRole;
 import com.jhj.schedule.group.dto.request.GroupMemberRequestDto;
-import com.jhj.schedule.job.dto.JobRangeRequestDto;
 import com.jhj.schedule.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;

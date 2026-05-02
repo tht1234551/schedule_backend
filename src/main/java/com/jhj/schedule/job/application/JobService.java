@@ -3,10 +3,11 @@ package com.jhj.schedule.job.application;
 
 import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.job.domain.Job;
-import com.jhj.schedule.job.dto.JobRangeRequestDto;
-import com.jhj.schedule.job.dto.JobRequestDto;
-import com.jhj.schedule.job.dto.JobResponseDto;
-import com.jhj.schedule.job.dto.JobUpdateRequestDto;
+import com.jhj.schedule.job.domain.JobPatch;
+import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
+import com.jhj.schedule.job.dto.request.JobCreateRequestDto;
+import com.jhj.schedule.job.dto.response.JobResponseDto;
+import com.jhj.schedule.job.dto.request.JobUpdateRequestDto;
 import com.jhj.schedule.job.exception.JobNotFoundException;
 import com.jhj.schedule.job.infrastructure.JobRepository;
 import com.jhj.schedule.user.domain.User;
@@ -32,7 +33,7 @@ public class JobService {
     }
 
     @Transactional
-    public JobResponseDto save(User user, JobRequestDto requestDto) {
+    public JobResponseDto save(User user, JobCreateRequestDto requestDto) {
         Job job = JobMapper.toDomain(requestDto, user);
         job.validatePeriod();
 
@@ -42,14 +43,16 @@ public class JobService {
 
     @Transactional
     public JobResponseDto modify(Long jobId, User user, JobUpdateRequestDto request) {
-        Job job = jobRepository.findByIdAndUserId(jobId, user.getId())
+        Long userId = user.getId();
+        Job job = jobRepository.findByIdAndUserId(jobId, userId)
                 .orElseThrow(JobNotFoundException::new);
 
-        JobMapper.applyToDomain(request, job);
+        JobPatch patch = JobMapper.toPatch(request);
+        JobMapper.applyFromTo(patch, job);
         job.validatePeriod();
 
-        Job update = jobRepository.update(job);
-        return JobMapper.toResponse(update);
+        jobRepository.update(jobId, userId, patch);
+        return JobMapper.toResponse(job);
     }
 
     @Transactional

@@ -1,8 +1,7 @@
-package com.jhj.schedule.job.dto;
+package com.jhj.schedule.job.dto.response;
 
 import com.jhj.schedule.job.domain.ContentsPolicyType;
 import com.jhj.schedule.job.domain.OwnerType;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

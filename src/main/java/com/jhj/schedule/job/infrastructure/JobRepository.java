@@ -1,9 +1,10 @@
 package com.jhj.schedule.job.infrastructure;
 
 import com.jhj.schedule.group.domain.GroupMemberStatus;
-import com.jhj.schedule.job.domain.Job;
 import com.jhj.schedule.job.domain.ContentsPolicyType;
-import com.jhj.schedule.job.dto.JobRangeRequestDto;
+import com.jhj.schedule.job.domain.Job;
+import com.jhj.schedule.job.domain.JobPatch;
+import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -42,26 +43,26 @@ public class JobRepository {
 
     public List<Job> findGroupJobs(Long userId, Long groupId, JobRangeRequestDto range) {
         return dsl.select(
-                JOBS.ID,
-                JOBS.USER_ID,
-                JOBS.START_AT,
-                JOBS.END_AT,
-                JOBS.HEX_COLOR,
-                JOBS.OPEN_TYPE,
-                JOBS.CREATED_AT,
-                JOBS.UPDATED_AT,
-                DSL
-                        .when(JOBS.USER_ID.eq(userId), JOBS.TITLE)
-                        .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.PUBLIC.name()), JOBS.TITLE)
-                        .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.MASKED.name()),
-                                DSL.val(ContentsPolicyType.MASKED.name()))
-                        .as(JOBS.TITLE),
-                DSL
-                        .when(JOBS.USER_ID.eq(userId), JOBS.DESCRIPTION)
-                        .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.PUBLIC.name()), JOBS.DESCRIPTION)
-                        .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.MASKED.name()), DSL.val(""))
-                        .as(JOBS.DESCRIPTION)
-        )
+                        JOBS.ID,
+                        JOBS.USER_ID,
+                        JOBS.START_AT,
+                        JOBS.END_AT,
+                        JOBS.HEX_COLOR,
+                        JOBS.OPEN_TYPE,
+                        JOBS.CREATED_AT,
+                        JOBS.UPDATED_AT,
+                        DSL
+                                .when(JOBS.USER_ID.eq(userId), JOBS.TITLE)
+                                .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.PUBLIC.name()), JOBS.TITLE)
+                                .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.MASKED.name()),
+                                        DSL.val(ContentsPolicyType.MASKED.name()))
+                                .as(JOBS.TITLE),
+                        DSL
+                                .when(JOBS.USER_ID.eq(userId), JOBS.DESCRIPTION)
+                                .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.PUBLIC.name()), JOBS.DESCRIPTION)
+                                .when(JOBS.OPEN_TYPE.eq(ContentsPolicyType.MASKED.name()), DSL.val(""))
+                                .as(JOBS.DESCRIPTION)
+                )
                 .from(JOBS)
                 .join(GROUP_MEMBERS).on(GROUP_MEMBERS.USER_ID.eq(JOBS.USER_ID))
                 .where(GROUP_MEMBERS.GROUP_ID.eq(groupId))
@@ -99,23 +100,39 @@ public class JobRepository {
         return job;
     }
 
-    public Job update(Job job) {
+    public void update(Long jobId, Long userId, JobPatch patch) {
         LocalDateTime now = LocalDateTime.now();
 
-        dsl.update(JOBS)
-                .set(JOBS.TITLE, job.getTitle())
-                .set(JOBS.START_AT, job.getStartAt())
-                .set(JOBS.END_AT, job.getEndAt())
-                .set(JOBS.HEX_COLOR, job.getHexColor())
-                .set(JOBS.DESCRIPTION, job.getDescription())
-                .set(JOBS.OPEN_TYPE, job.getContentsPolicyType() != null ? job.getContentsPolicyType().name() : null)
-                .set(JOBS.UPDATED_AT, now)
-                .where(JOBS.ID.eq(job.getId()))
+        var step = dsl.update(JOBS).set(JOBS.UPDATED_AT, now);
+
+        if (patch.getTitle().isPresent()) {
+            step = step.set(JOBS.TITLE, patch.getTitle().get());
+        }
+
+        if (patch.getStartAt().isPresent()) {
+            step = step.set(JOBS.START_AT, patch.getStartAt().get());
+        }
+
+        if (patch.getEndAt().isPresent()) {
+            step = step.set(JOBS.END_AT, patch.getEndAt().get());
+        }
+
+        if (patch.getHexColor().isPresent()) {
+            step = step.set(JOBS.HEX_COLOR, patch.getHexColor().get());
+        }
+
+        if (patch.getDescription().isPresent()) {
+            step = step.set(JOBS.DESCRIPTION, patch.getDescription().get());
+        }
+
+        if (patch.getContentsPolicyType().isPresent()) {
+            step = step.set(JOBS.OPEN_TYPE, patch.getContentsPolicyType().get().name());
+        }
+
+        step
+                .where(JOBS.ID.eq(jobId))
+                .and(JOBS.USER_ID.eq(userId))
                 .execute();
-
-        job.setUpdatedAt(now);
-
-        return job;
     }
 
     public void delete(Long id) {

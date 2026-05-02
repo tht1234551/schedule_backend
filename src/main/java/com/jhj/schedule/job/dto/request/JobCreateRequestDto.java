@@ -1,4 +1,4 @@
-package com.jhj.schedule.job.dto;
+package com.jhj.schedule.job.dto.request;
 
 import com.jhj.schedule.job.domain.ContentsPolicyType;
 import com.jhj.schedule.job.domain.OwnerType;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class JobRequestDto {
+public class JobCreateRequestDto {
 
     @NotBlank(message = "타이틀을 입력해주세요")
     private String title;
@@ -24,11 +24,14 @@ public class JobRequestDto {
     @NotNull(message = "종료일을 입력해주세요")
     private LocalDateTime endAt;
 
-    @NotNull private OwnerType ownerType;
+    @NotNull
+    private OwnerType ownerType;
 
     private Long groupId; // ownerType==GROUP 일 때만
 
+    @NotNull
+    private ContentsPolicyType contentsPolicyType;
+
     private String hexColor;
     private String description;
-    private ContentsPolicyType contentsPolicyType;
 }

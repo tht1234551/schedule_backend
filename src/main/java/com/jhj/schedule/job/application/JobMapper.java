@@ -1,9 +1,10 @@
 package com.jhj.schedule.job.application;
 
 import com.jhj.schedule.job.domain.Job;
-import com.jhj.schedule.job.dto.JobRequestDto;
-import com.jhj.schedule.job.dto.JobResponseDto;
-import com.jhj.schedule.job.dto.JobUpdateRequestDto;
+import com.jhj.schedule.job.domain.JobPatch;
+import com.jhj.schedule.job.dto.request.JobCreateRequestDto;
+import com.jhj.schedule.job.dto.response.JobResponseDto;
+import com.jhj.schedule.job.dto.request.JobUpdateRequestDto;
 import com.jhj.schedule.user.domain.User;
 import org.openapitools.jackson.nullable.JsonNullable;
 
@@ -12,7 +13,7 @@ import java.util.function.Supplier;
 
 public class JobMapper {
 
-    public static Job toDomain(JobRequestDto request, User user) {
+    public static Job toDomain(JobCreateRequestDto request, User user) {
         return Job.builder()
                 .title(request.getTitle())
                 .startAt(request.getStartAt())
@@ -26,13 +27,27 @@ public class JobMapper {
                 .build();
     }
 
-    public static void applyToDomain(JobUpdateRequestDto request, Job job) {
-        apply(job::setTitle, request::getTitle);
-        apply(job::setStartAt, request::getStartAt);
-        apply(job::setEndAt, request::getEndAt);
-        apply(job::setHexColor, request::getHexColor);
-        apply(job::setDescription, request::getDescription);
-        apply(job::setContentsPolicyType, request::getContentsPolicyType);
+
+    public static JobPatch toPatch(JobUpdateRequestDto from) {
+        JobPatch to = new JobPatch();
+
+        applyJsonNullable(from::getTitle, to::setTitle);
+        applyJsonNullable(from::getStartAt, to::setStartAt);
+        applyJsonNullable(from::getEndAt, to::setEndAt);
+        applyJsonNullable(from::getHexColor, to::setHexColor);
+        applyJsonNullable(from::getDescription, to::setDescription);
+        applyJsonNullable(from::getContentsPolicyType, to::setContentsPolicyType);
+
+        return to;
+    }
+
+    public static void applyFromTo(JobPatch from, Job to) {
+        applyPrimitive(from::getTitle, to::setTitle);
+        applyPrimitive(from::getStartAt, to::setStartAt);
+        applyPrimitive(from::getEndAt, to::setEndAt);
+        applyPrimitive(from::getHexColor, to::setHexColor);
+        applyPrimitive(from::getDescription, to::setDescription);
+        applyPrimitive(from::getContentsPolicyType, to::setContentsPolicyType);
     }
 
     public static JobResponseDto toResponse(Job job) {
@@ -50,11 +65,19 @@ public class JobMapper {
                 .build();
     }
 
-    private static <T> void apply(Consumer<T> consumer, Supplier<JsonNullable<T>> supplier) {
+    private static <T> void applyPrimitive(Supplier<JsonNullable<T>> supplier, Consumer<T> consumer) {
+        JsonNullable<T> jsonNullable = supplier.get();
+
+        if(jsonNullable.isPresent()) {
+            consumer.accept(jsonNullable.get());
+        }
+    }
+
+    private static <T> void applyJsonNullable(Supplier<JsonNullable<T>> supplier, Consumer<JsonNullable<T>> consumer) {
         JsonNullable<T> value = supplier.get();
 
         if (value.isPresent()) {
-            consumer.accept(value.orElse(null));
+            consumer.accept(value);
         }
     }
 }
