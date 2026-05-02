@@ -1,7 +1,9 @@
 package com.jhj.schedule.job.exception;
 
-public class InvalidJobPeriodException extends RuntimeException {
+import com.jhj.schedule.common.exception.CustomRuntimeException;
+
+public class InvalidJobPeriodException extends CustomRuntimeException {
     public InvalidJobPeriodException() {
-        super("종료일은 시작일 이후여야 합니다.");
+        super(JobErrorCode.INVALID_JOB_PERIOD);
     }
 }

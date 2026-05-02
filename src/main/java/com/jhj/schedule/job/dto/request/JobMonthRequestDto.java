@@ -9,10 +9,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class JobRangeRequestDto {
+public class JobMonthRequestDto {
 
     @Min(1970)
     @Max(2100)
@@ -23,12 +21,12 @@ public class JobRangeRequestDto {
     private int month;
 
     @JsonIgnore
-    public LocalDateTime getStartDate() {
+    public LocalDateTime getStartOfMonth() {
         return LocalDateTime.of(year, month, 1, 0, 0);
     }
 
     @JsonIgnore
-    public LocalDateTime getEndDate() {
+    public LocalDateTime getStartOfNextMonth() {
         return LocalDateTime.of(year, month, 1, 0, 0)
                 .plusMonths(1);
     }

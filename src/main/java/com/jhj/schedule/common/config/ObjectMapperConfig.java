@@ -11,6 +11,9 @@ import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomize
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.cfg.CoercionAction;
+import tools.jackson.databind.cfg.CoercionInputShape;
+import tools.jackson.databind.type.LogicalType;
 
 @Configuration
 @RequiredArgsConstructor
@@ -38,4 +41,12 @@ public class ObjectMapperConfig {
 //    JsonMapperBuilderCustomizer jacksonCustomizer() {
 //        return builder -> builder.addModule(jsonNullableModule());
 //    }
+
+//    @Bean
+//    public JsonMapperBuilderCustomizer enumCoercion() {
+//        return builder -> builder
+//                .withCoercionConfig(LogicalType.Enum, cfg ->
+//                        cfg.setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail));
+//    }
+
 }

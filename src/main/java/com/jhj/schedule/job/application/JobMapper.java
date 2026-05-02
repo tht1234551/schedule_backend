@@ -13,6 +13,8 @@ import java.util.function.Supplier;
 
 public class JobMapper {
 
+    private JobMapper() {}
+
     public static Job toDomain(JobCreateRequestDto request, User user) {
         return Job.builder()
                 .title(request.getTitle())
@@ -31,23 +33,23 @@ public class JobMapper {
     public static JobPatch toPatch(JobUpdateRequestDto from) {
         JobPatch to = new JobPatch();
 
-        applyJsonNullable(from::getTitle, to::setTitle);
-        applyJsonNullable(from::getStartAt, to::setStartAt);
-        applyJsonNullable(from::getEndAt, to::setEndAt);
-        applyJsonNullable(from::getHexColor, to::setHexColor);
-        applyJsonNullable(from::getDescription, to::setDescription);
-        applyJsonNullable(from::getContentsPolicyType, to::setContentsPolicyType);
+        apply(from::getTitle, to::setTitle);
+        apply(from::getStartAt, to::setStartAt);
+        apply(from::getEndAt, to::setEndAt);
+        apply(from::getHexColor, to::setHexColor);
+        apply(from::getDescription, to::setDescription);
+        apply(from::getContentsPolicyType, to::setContentsPolicyType);
 
         return to;
     }
 
     public static void applyFromTo(JobPatch from, Job to) {
-        applyPrimitive(from::getTitle, to::setTitle);
-        applyPrimitive(from::getStartAt, to::setStartAt);
-        applyPrimitive(from::getEndAt, to::setEndAt);
-        applyPrimitive(from::getHexColor, to::setHexColor);
-        applyPrimitive(from::getDescription, to::setDescription);
-        applyPrimitive(from::getContentsPolicyType, to::setContentsPolicyType);
+        applyUnwrapped(from::getTitle, to::setTitle);
+        applyUnwrapped(from::getStartAt, to::setStartAt);
+        applyUnwrapped(from::getEndAt, to::setEndAt);
+        applyUnwrapped(from::getHexColor, to::setHexColor);
+        applyUnwrapped(from::getDescription, to::setDescription);
+        applyUnwrapped(from::getContentsPolicyType, to::setContentsPolicyType);
     }
 
     public static JobResponseDto toResponse(Job job) {
@@ -62,10 +64,12 @@ public class JobMapper {
                 .contentsPolicyType(job.getContentsPolicyType())
                 .ownerType(job.getOwnerType())
                 .groupId(job.getGroupId())
+                .createdAt(job.getCreatedAt())
+                .updatedAt(job.getUpdatedAt())
                 .build();
     }
 
-    private static <T> void applyPrimitive(Supplier<JsonNullable<T>> supplier, Consumer<T> consumer) {
+    private static <T> void applyUnwrapped(Supplier<JsonNullable<T>> supplier, Consumer<T> consumer) {
         JsonNullable<T> jsonNullable = supplier.get();
 
         if(jsonNullable.isPresent()) {
@@ -73,7 +77,7 @@ public class JobMapper {
         }
     }
 
-    private static <T> void applyJsonNullable(Supplier<JsonNullable<T>> supplier, Consumer<JsonNullable<T>> consumer) {
+    private static <T> void apply(Supplier<JsonNullable<T>> supplier, Consumer<JsonNullable<T>> consumer) {
         JsonNullable<T> value = supplier.get();
 
         if (value.isPresent()) {

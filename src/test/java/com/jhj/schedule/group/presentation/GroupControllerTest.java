@@ -4,7 +4,7 @@ import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
 import com.jhj.schedule.group.application.GroupService;
 import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.job.application.JobService;
-import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
+import com.jhj.schedule.job.dto.request.JobMonthRequestDto;
 import com.jhj.schedule.job.dto.response.JobResponseDto;
 import com.jhj.schedule.user.domain.Authority;
 import com.jhj.schedule.user.domain.User;
@@ -73,10 +73,10 @@ class GroupControllerTest {
     void getGroupJobs_success() throws Exception {
         // given
         Long groupId = 1L;
-        JobRangeRequestDto jobRangeRequestDto = JobRangeRequestDto.builder()
-                .year(2026)
-                .month(4)
-                .build();
+        JobMonthRequestDto jobMonthRequestDto = new JobMonthRequestDto();
+
+        jobMonthRequestDto.setYear(2026);
+        jobMonthRequestDto.setMonth(4);
 
         GroupJobsResponseDto response = GroupJobsResponseDto.builder()
                 .groupId(groupId)
@@ -85,7 +85,7 @@ class GroupControllerTest {
                 ))
                 .build();
 
-        given(jobService.findGroupJobs(any(User.class), eq(groupId), any(JobRangeRequestDto.class)))
+        given(jobService.findGroupJobs(any(User.class), eq(groupId), any(JobMonthRequestDto.class)))
                 .willReturn(response);
 
         // when & then
@@ -97,7 +97,7 @@ class GroupControllerTest {
                 .andExpect(jsonPath("$[0].groupId").value(groupId))
                 .andExpect(jsonPath("$[0].jobs[0].id").value(100));
 
-        verify(jobService).findGroupJobs(any(User.class), eq(groupId), any(JobRangeRequestDto.class));
+        verify(jobService).findGroupJobs(any(User.class), eq(groupId), any(JobMonthRequestDto.class));
     }
 
 //    @Test

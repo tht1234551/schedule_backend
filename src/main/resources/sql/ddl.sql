@@ -70,9 +70,9 @@ create table IF NOT EXISTS jobs
     hex_color   varchar(7),
     start_at  timestamp(6) not null,
     end_at    timestamp(6) not null,
-    open_type   varchar(10)
-        constraint jobs_open_type_check
-            check (open_type in ('PUBLIC', 'PRIVATE', 'MASKED')),
+    contents_policy_type   varchar(10)
+        constraint jobs_contents_policy_type_check
+            check (contents_policy_type in ('PUBLIC', 'PRIVATE', 'MASKED')),
     owner_type  varchar(10)
         constraint jobs_owner_type_check
             check (owner_type in ('GROUP', 'USER')),

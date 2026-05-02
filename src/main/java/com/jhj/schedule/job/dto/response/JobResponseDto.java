@@ -22,4 +22,6 @@ public class JobResponseDto {
     private String description;
     private OwnerType ownerType;
     private Long groupId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -7,7 +7,7 @@ import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.group.dto.response.GroupResponseDto;
 import com.jhj.schedule.group.dto.response.GroupSummaryResponseDto;
 import com.jhj.schedule.job.application.JobService;
-import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
+import com.jhj.schedule.job.dto.request.JobMonthRequestDto;
 import com.jhj.schedule.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +37,9 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<GroupResponseDto> createGroup(
             @CurrentUser User user,
-            @RequestBody GroupRequestDto dto
+            @RequestBody GroupRequestDto requestDto
     ) {
-        GroupResponseDto groupResponseDto = groupService.createGroup(user, dto);
+        GroupResponseDto groupResponseDto = groupService.createGroup(user, requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(groupResponseDto);
     }
@@ -53,9 +53,9 @@ public class GroupController {
     public ResponseEntity<GroupJobsResponseDto> getGroupJobs(
             @CurrentUser User user,
             @PathVariable Long groupId,
-            @Valid @ModelAttribute JobRangeRequestDto range
+            @Valid @ModelAttribute JobMonthRequestDto requestDto
     ) {
-        GroupJobsResponseDto groupJobs = jobService.findGroupJobs(user, groupId, range);
+        GroupJobsResponseDto groupJobs = jobService.findGroupJobs(user, groupId, requestDto);
 
         return ResponseEntity.ok(groupJobs);
     }

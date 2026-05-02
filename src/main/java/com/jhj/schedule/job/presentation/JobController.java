@@ -2,7 +2,7 @@ package com.jhj.schedule.job.presentation;
 
 import com.jhj.schedule.common.annotation.CurrentUser;
 import com.jhj.schedule.job.application.JobService;
-import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
+import com.jhj.schedule.job.dto.request.JobMonthRequestDto;
 import com.jhj.schedule.job.dto.request.JobCreateRequestDto;
 import com.jhj.schedule.job.dto.response.JobResponseDto;
 import com.jhj.schedule.job.dto.request.JobUpdateRequestDto;
@@ -23,15 +23,15 @@ public class JobController {
     private final JobService jobService;
 
     @GetMapping
-    ResponseEntity<List<JobResponseDto>> getMyJobs(
+    public ResponseEntity<List<JobResponseDto>> getMyJobs(
             @CurrentUser User user,
-            @Valid @ModelAttribute JobRangeRequestDto request) {
+            @Valid @ModelAttribute JobMonthRequestDto request) {
         List<JobResponseDto> personalJobs = jobService.findPersonalJobs(user, request);
         return ResponseEntity.ok(personalJobs);
     }
 
     @PostMapping
-    ResponseEntity<JobResponseDto> addJob(
+    public ResponseEntity<JobResponseDto> addJob(
             @CurrentUser User user,
             @Valid @RequestBody JobCreateRequestDto request) {
         JobResponseDto jobResponseDto = jobService.save(user, request);

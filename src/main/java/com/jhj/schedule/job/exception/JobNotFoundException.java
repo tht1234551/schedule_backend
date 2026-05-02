@@ -1,7 +1,9 @@
 package com.jhj.schedule.job.exception;
 
-public class JobNotFoundException extends RuntimeException {
+import com.jhj.schedule.common.exception.CustomRuntimeException;
+
+public class JobNotFoundException extends CustomRuntimeException {
     public JobNotFoundException() {
-        super("일정을 찾을 수 없습니다.");
+        super(JobErrorCode.JOB_NOT_FOUND);
     }
 }

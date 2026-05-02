@@ -3,8 +3,9 @@ package com.jhj.schedule.job.dto.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jhj.schedule.job.domain.ContentsPolicyType;
+import com.jhj.schedule.job.dto.JobValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,36 +20,42 @@ import java.time.LocalDateTime;
 public class JobUpdateRequestDto {
 
     @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private JsonNullable<String> title = JsonNullable.undefined();
+    private JsonNullable<
+            @NotBlank @Size(max = JobValidation.TITLE_MAX) String
+            > title = JsonNullable.undefined();
 
     @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private JsonNullable<LocalDateTime> startAt = JsonNullable.undefined();
 
     @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private JsonNullable<LocalDateTime> endAt  = JsonNullable.undefined();
+    private JsonNullable<LocalDateTime> endAt = JsonNullable.undefined();
 
     @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private JsonNullable<String> hexColor = JsonNullable.undefined();
+    private JsonNullable<
+            @Pattern(
+                    regexp = JobValidation.HEX_COLOR_PATTERN,
+                    message = JobValidation.HEX_COLOR_MESSAGE) String
+            > hexColor = JsonNullable.undefined();
 
     @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private JsonNullable<String> description = JsonNullable.undefined();
+    private JsonNullable<
+            @Size(max = JobValidation.DESCRIPTION_MAX) String
+            > description = JsonNullable.undefined();
 
     @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private JsonNullable<ContentsPolicyType> contentsPolicyType = JsonNullable.undefined();
+    private JsonNullable<
+            @NotNull(message = "공개 정책 필드는 지울 수 없습니다.") ContentsPolicyType
+            > contentsPolicyType = JsonNullable.undefined();
 
     @JsonIgnore
-    @AssertTrue(message = "타이틀은 지울 수 없습니다")
-    public boolean isTitleNotNull() {
-        return checkNotNull(title);
+    @AssertFalse(message = "수정할 데이터가 없습니다.")
+    public boolean isEmpty() {
+        return !title.isPresent()
+                && !startAt.isPresent()
+                && !endAt.isPresent()
+                && !hexColor.isPresent()
+                && !description.isPresent()
+                && !contentsPolicyType.isPresent();
     }
 
-    @JsonIgnore
-    @AssertTrue(message = "공개 정책 필드는 지울 수 없습니다.")
-    public boolean isContentsPolicyTypeNotNull() {
-        return checkNotNull(contentsPolicyType);
-    }
-
-    private <T> boolean checkNotNull(JsonNullable<T> jsonNullable) {
-        return !jsonNullable.isPresent() || jsonNullable.get() != null;
-    }
 }

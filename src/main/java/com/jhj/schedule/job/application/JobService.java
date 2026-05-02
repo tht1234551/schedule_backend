@@ -4,7 +4,8 @@ package com.jhj.schedule.job.application;
 import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
 import com.jhj.schedule.job.domain.Job;
 import com.jhj.schedule.job.domain.JobPatch;
-import com.jhj.schedule.job.dto.request.JobRangeRequestDto;
+import com.jhj.schedule.job.domain.OwnerType;
+import com.jhj.schedule.job.dto.request.JobMonthRequestDto;
 import com.jhj.schedule.job.dto.request.JobCreateRequestDto;
 import com.jhj.schedule.job.dto.response.JobResponseDto;
 import com.jhj.schedule.job.dto.request.JobUpdateRequestDto;
@@ -24,7 +25,7 @@ public class JobService {
     private final JobRepository jobRepository;
 
     @Transactional(readOnly = true)
-    public List<JobResponseDto> findPersonalJobs(User user, JobRangeRequestDto request) {
+    public List<JobResponseDto> findPersonalJobs(User user, JobMonthRequestDto request) {
         return jobRepository
                 .findOverlappingJobs(user.getId(), request)
                 .stream()
@@ -34,6 +35,8 @@ public class JobService {
 
     @Transactional
     public JobResponseDto save(User user, JobCreateRequestDto requestDto) {
+        // TODO 그룹일정일 경우 권한 확인 필요함
+//        if (requestDto.getOwnerType() == OwnerType.GROUP){}
         Job job = JobMapper.toDomain(requestDto, user);
         job.validatePeriod();
 
@@ -44,27 +47,33 @@ public class JobService {
     @Transactional
     public JobResponseDto modify(Long jobId, User user, JobUpdateRequestDto request) {
         Long userId = user.getId();
-        Job job = jobRepository.findByIdAndUserId(jobId, userId)
+        Job oldJob = jobRepository.findByIdAndUserId(jobId, userId)
                 .orElseThrow(JobNotFoundException::new);
 
         JobPatch patch = JobMapper.toPatch(request);
-        JobMapper.applyFromTo(patch, job);
-        job.validatePeriod();
+        JobMapper.applyFromTo(patch, oldJob);
+        oldJob.validatePeriod();
 
-        jobRepository.update(jobId, userId, patch);
+        if (jobRepository.update(jobId, userId, patch) == 0) {
+            throw new JobNotFoundException();
+        }
+
+        Job job = jobRepository.findByIdAndUserId(jobId, userId)
+                .orElseThrow(JobNotFoundException::new);
+
         return JobMapper.toResponse(job);
     }
 
     @Transactional
     public void deleteJob(Long jobId, User user) {
-        Job job = jobRepository.findByIdAndUserId(jobId, user.getId())
-                .orElseThrow(JobNotFoundException::new);
-        jobRepository.delete(job.getId());
+        if (jobRepository.delete(jobId, user.getId()) == 0) {
+            throw new JobNotFoundException();
+        }
     }
 
     @Transactional(readOnly = true)
-    public GroupJobsResponseDto findGroupJobs(User user, Long groupId, JobRangeRequestDto range) {
-        List<Job> jobs = jobRepository.findGroupJobs(user.getId(), groupId, range);
+    public GroupJobsResponseDto findGroupJobs(User user, Long groupId, JobMonthRequestDto requestDto) {
+        List<Job> jobs = jobRepository.findGroupJobs(user.getId(), groupId, requestDto);
         List<JobResponseDto> jobResponses = jobs.stream().map(JobMapper::toResponse).toList();
 
         return GroupJobsResponseDto.builder()
