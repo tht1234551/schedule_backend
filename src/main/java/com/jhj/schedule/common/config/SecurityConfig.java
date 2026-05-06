@@ -1,13 +1,15 @@
 package com.jhj.schedule.common.config;
 
-import com.jhj.schedule.auth.infrastructure.RefreshTokenRepository;
+import com.jhj.schedule.auth.application.AuthService;
 import com.jhj.schedule.auth.security.jwt.JwtFilter;
 import com.jhj.schedule.auth.security.jwt.JwtUtil;
 import com.jhj.schedule.auth.security.jwt.LoginFilter;
+import com.jhj.schedule.auth.security.jwt.RefreshTokenCookieFactory;
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetailService;
 import com.jhj.schedule.common.util.ActiveProfileUtil;
 import com.jhj.schedule.user.application.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,7 +18,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,6 +28,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
@@ -35,21 +38,26 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailService customUserDetailService;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenCookieFactory refreshTokenCookieFactory;
     private final JwtUtil jwtUtil;
     private final ActiveProfileUtil activeProfileUtil;
     private final UserService userService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            AuthenticationManager authenticationManager,
+            AuthService authService,
+            ObjectMapper objectMapper
+    ) {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 프론트 CORS 헤더 세팅
                 .csrf(CsrfConfigurer::disable) // REST API라면 비활성화
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(
-                            "/api/auth/**",
+                            "/api/v1/auth/**",
                             "/actuator",
                             "/actuator/health",
                             "/error",
@@ -84,11 +92,17 @@ public class SecurityConfig {
                 );
 
 
-        LoginFilter loginFilter = new LoginFilter(authenticationManager, refreshTokenRepository, jwtUtil);
+        LoginFilter loginFilter = new LoginFilter(
+                authenticationManager,
+                authService,
+                refreshTokenCookieFactory,
+                objectMapper,
+                handlerExceptionResolver
+        );
         loginFilter.setFilterProcessesUrl("/api/v1/auth/login");
 
         http
-                .addFilterBefore(new JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil, userService, handlerExceptionResolver), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
 
@@ -117,7 +131,7 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    public DaoAuthenticationProvider authenticationProvider(CustomUserDetailService customUserDetailService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customUserDetailService);
         provider.setPasswordEncoder(passwordEncoder());
 

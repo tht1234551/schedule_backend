@@ -1,6 +1,6 @@
 package com.jhj.schedule.user.application;
 
-import com.jhj.schedule.auth.exception.EmailAlreadyExistsException;
+import com.jhj.schedule.user.exception.EmailAlreadyExistsException;
 import com.jhj.schedule.common.config.RedisCacheConfig;
 import com.jhj.schedule.user.domain.User;
 import com.jhj.schedule.user.exception.UserNotFoundException;
@@ -23,16 +23,6 @@ public class UserService {
      */
     public User loadCredentialsByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-    }
-
-    @Cacheable(value = RedisCacheConfig.USER_BY_EMAIL, key = "#email")
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .map(u -> {
-                    u.setPassword(null);
-                    return u;
-                })
                 .orElseThrow(UserNotFoundException::new);
     }
 

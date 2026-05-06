@@ -1,30 +1,54 @@
 package com.jhj.schedule.auth.security.jwt;
 
+import com.jhj.schedule.auth.exception.ExpiredTokenException;
+import com.jhj.schedule.auth.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JwtUtil {
 
+    private static final String CLAIM_KEY = "userId";
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final int BEARER_PREFIX_LENGTH = BEARER_PREFIX.length();
+
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    private String secretKey;
 
     @Value("${jwt.expiration.access}")
-    private long ACCESS_TOKEN_EXPIRATION;
+    private long accessTokenExpiration;
 
     @Value("${jwt.expiration.refresh}")
-    private long REFRESH_TOKEN_EXPIRATION;
+    private long refreshTokenExpiration;
 
-    // JWT Token 발급
-    public String createToken(Claims claims, long expireTimeMs) {
+    @Getter
+    private SecretKey signingKey;
+
+    @PostConstruct
+    public void initialize(){
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String createToken(Long userId, long expireTimeMs) {
+        Claims claims = Jwts.claims()
+                .add(CLAIM_KEY, userId)
+                .build();
+
         return Jwts.builder()
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -33,66 +57,42 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String createAccessToken(Long id, String email, String role) {
-        Claims claims = Jwts.claims()
-                .add("id", id)
-                .add("email", email)
-                .add("role", role)
-                .build();
-
-        return createToken(claims, ACCESS_TOKEN_EXPIRATION);
+    public String createAccessToken(Long userId) {
+        return createToken(userId, accessTokenExpiration);
     }
 
-    public String createRefreshToken(String email) {
-        Claims claims = Jwts.claims()
-                .add("email", email)
-                .build();
-
-        return createToken(claims, REFRESH_TOKEN_EXPIRATION);
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenExpiration);
     }
 
-    public SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+    public LocalDateTime getRefreshTokenExpiry() {
+        return LocalDateTime.now().plus(refreshTokenExpiration, ChronoUnit.MILLIS);
     }
 
-    public Claims extractAllClaims(String token){
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    public Long getUserId(String token) {
+        Claims claims = parseClaims(token);
+        return Long.parseLong(claims.get(CLAIM_KEY).toString());
     }
 
-    public boolean invalid(String token) {
+    public Optional<String> extractBearerToken(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(authorizationHeader.substring(BEARER_PREFIX_LENGTH));
+    }
+
+    private Claims parseClaims(String token) {
         try {
-            Jwts.parser()
+            return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
-                    .parseSignedClaims(token);
-
-            return false;
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredTokenException(e);
         } catch (JwtException | IllegalArgumentException e) {
-            return true;
+            throw new InvalidTokenException(e);
         }
-    }
-
-    public Long getId(String token) {
-        return Long.parseLong(getData(token, "id"));
-    }
-
-    public String getEmail(String token) {
-        return getData(token, "email");
-    }
-
-    public String getData(String token, String field) {
-        return extractAllClaims(token).get(field).toString();
-    }
-
-    // 밝급된 Token이 만료 시간이 지났는지 체크
-    public boolean isExpired(String token) {
-        Date expiredDate = extractAllClaims(token).getExpiration();
-        // Token의 만료 날짜가 지금보다 이전인지 check
-        return expiredDate.before(new Date());
     }
 }

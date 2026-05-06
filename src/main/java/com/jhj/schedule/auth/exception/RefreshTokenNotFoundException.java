@@ -1,7 +1,9 @@
 package com.jhj.schedule.auth.exception;
 
-public class RefreshTokenNotFoundException extends RuntimeException {
+import com.jhj.schedule.common.exception.CustomRuntimeException;
+
+public class RefreshTokenNotFoundException extends CustomRuntimeException {
     public RefreshTokenNotFoundException() {
-        super("토큰이 존재하지 않습니다");
+        super(AuthErrorCode.NOT_FOUND_TOKEN);
     }
 }

@@ -1,15 +1,16 @@
 package com.jhj.schedule.auth.presentation;
 
 import com.jhj.schedule.auth.application.AuthService;
+import com.jhj.schedule.auth.dto.IssuedTokens;
 import com.jhj.schedule.auth.dto.SignUpRequestDto;
-import com.jhj.schedule.auth.exception.RefreshTokenNotFoundException;
+import com.jhj.schedule.auth.security.jwt.RefreshTokenCookieFactory;
 import com.jhj.schedule.user.dto.UserResponseDto;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,38 +22,41 @@ import java.util.Optional;
 public class AuthController {
 
     private final AuthService authService;
-
+    private final RefreshTokenCookieFactory refreshTokenCookieFactory;
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> signUp(@Valid @RequestBody SignUpRequestDto request) {
         UserResponseDto userResponseDto = authService.signUp(request);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
-        Optional.ofNullable(refreshToken).orElseThrow(RefreshTokenNotFoundException::new);
-        String newRefreshToken = authService.createRefreshToken(refreshToken);
+            @CookieValue(name = RefreshTokenCookieFactory.NAME) String refreshToken,
+            HttpServletRequest request
+    ) {
+        IssuedTokens issuedTokens = authService.reissueTokens(refreshToken);
+        ResponseCookie refreshTokenCookie = refreshTokenCookieFactory.issue(issuedTokens.getRefreshToken(), request.isSecure());
 
         return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + newRefreshToken)
+                .headers((httpHeaders) -> httpHeaders.setBearerAuth(issuedTokens.getAccessToken()))
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .build();
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken, HttpServletRequest request, HttpServletResponse response) {
+            @CookieValue(name = RefreshTokenCookieFactory.NAME, required = false) String refreshToken,
+            HttpServletRequest request
+    ) {
         Optional.ofNullable(refreshToken)
                 .ifPresent(authService::deleteToken);
+        ResponseCookie expire = refreshTokenCookieFactory.expire(request.isSecure());
 
-        // 쿠키 삭제
-        Cookie cookie = new Cookie("refreshToken", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok("로그아웃 성공");
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, expire.toString())
+                .build();
     }
 }
