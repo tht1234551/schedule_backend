@@ -8,7 +8,6 @@ import com.jhj.schedule.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,18 +45,12 @@ public class UserService {
 
     // TODO: user 기본 기능 개발
 
-    @Caching(evict = {
-            @CacheEvict(value = RedisCacheConfig.USER_BY_ID,    key = "#user.id"),
-            @CacheEvict(value = RedisCacheConfig.USER_BY_EMAIL, key = "#user.email")
-    })
+    @CacheEvict(value = RedisCacheConfig.USER_BY_ID, key = "#user.id")
     public User update(User user) {
         return null;
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = RedisCacheConfig.USER_BY_ID,    key = "#user.id"),
-            @CacheEvict(value = RedisCacheConfig.USER_BY_EMAIL, key = "#user.email")
-    })
+    @CacheEvict(value = RedisCacheConfig.USER_BY_ID, key = "#user.id")
     public void delete(User user) {
         return;
     }

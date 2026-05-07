@@ -16,7 +16,6 @@ import java.time.Duration;
 public class RedisCacheConfig {
 
     public static final String USER_BY_ID = "user:byId";
-    public static final String USER_BY_EMAIL = "user:byEmail";
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {

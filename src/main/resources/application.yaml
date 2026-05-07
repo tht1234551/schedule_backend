@@ -23,8 +23,8 @@ spring:
 
 logging:
   level:
-    org.springframework.security: DEBUG
-    org.springframework.boot.autoconfigure.security: DEBUG
+#    org.springframework.security: DEBUG
+#    org.springframework.boot.autoconfigure.security: DEBUG
     org.jooq.tools.LoggerListener: DEBUG
     org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
 
@@ -43,4 +43,4 @@ jwt:
   secret: ho0PCPYX5o5x0xNZhSGjkLgKMHLbsrPdX4plfRCWPf8=
   expiration:
     access: 86400000 # 하루
-    refresh: 86400000 # 하루
+    refresh: 604800000 # 일주일
