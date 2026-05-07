@@ -1,6 +1,5 @@
 package com.jhj.schedule.user.infrastructure;
 
-import com.jhj.schedule.jooq.tables.records.UsersRecord;
 import com.jhj.schedule.user.domain.Authority;
 import com.jhj.schedule.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +73,16 @@ public class UserRepository {
         user.setUpdatedAt(now);
 
         return user;
+    }
+
+    public void updatePassword(Long id, String password) {
+        LocalDateTime now = LocalDateTime.now();
+
+        dsl.update(USERS)
+                .set(USERS.PASSWORD, password)
+                .set(USERS.UPDATED_AT, now)
+                .where(USERS.ID.eq(id))
+                .execute();
     }
 
     private static User toDomain(Record r) {

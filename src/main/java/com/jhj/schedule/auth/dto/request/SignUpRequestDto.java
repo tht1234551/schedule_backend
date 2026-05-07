@@ -1,6 +1,7 @@
-package com.jhj.schedule.auth.dto;
+package com.jhj.schedule.auth.dto.request;
 
-import com.jhj.schedule.jooq.tables.records.UsersRecord;
+import com.jhj.schedule.auth.dto.PasswordValidation;
+import com.jhj.schedule.user.dto.UserValidation;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -16,7 +17,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SignUpRequestDto {
 
-    @NotBlank(message = "이름을 입력해주세요.")
+    @NotBlank(message = UserValidation.NAME_NOT_BLANK_MESSAGE)
+    @Size(max = UserValidation.NAME_MAX_LENGTH, message = UserValidation.NAME_MAX_MESSAGE)
     private String name;
 
     @NotBlank(message = "이메일을 입력해주세요.")
@@ -24,10 +26,13 @@ public class SignUpRequestDto {
     private String email;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
-    @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
+    @Size(
+            min = PasswordValidation.MIN_LENGTH,
+            max = PasswordValidation.MAX_LENGTH,
+            message = PasswordValidation.LENGTH_MESSAGE)
     @Pattern(
-            regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",
-            message = "비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다."
+            regexp = PasswordValidation.PATTERN,
+            message = PasswordValidation.PATTERN_MESSAGE
     )
     private String password;
 

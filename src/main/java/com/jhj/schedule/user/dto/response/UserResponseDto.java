@@ -1,4 +1,4 @@
-package com.jhj.schedule.user.dto;
+package com.jhj.schedule.user.dto.response;
 
 import com.jhj.schedule.user.domain.Authority;
 import com.jhj.schedule.user.domain.User;

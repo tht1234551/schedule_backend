@@ -1,8 +1,10 @@
 package com.jhj.schedule.auth.security.jwt;
 
+import com.jhj.schedule.auth.exception.AuthErrorCode;
 import com.jhj.schedule.auth.exception.ExpiredTokenException;
 import com.jhj.schedule.auth.exception.InvalidTokenException;
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
+import com.jhj.schedule.common.exception.CustomRuntimeException;
 import com.jhj.schedule.user.application.UserService;
 import com.jhj.schedule.user.domain.User;
 import com.jhj.schedule.user.exception.UserErrorCode;
@@ -51,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
             resolver.resolveException(request, response, null, e);
             return;
         } catch (UserNotFoundException e) {
-            resolver.resolveException(request, response, null, new UserNotFoundException(UserErrorCode.UNAUTHORIZED, e));
+            resolver.resolveException(request, response, null, new CustomRuntimeException(AuthErrorCode.UNAUTHORIZED, e));
             return;
         }
 

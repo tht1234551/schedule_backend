@@ -1,6 +1,6 @@
 package com.jhj.schedule.security;
 
-import com.jhj.schedule.auth.dto.LoginRequestDto;
+import com.jhj.schedule.auth.dto.request.LoginRequestDto;
 import com.jhj.schedule.user.domain.Authority;
 import com.jhj.schedule.user.domain.User;
 import com.jhj.schedule.user.infrastructure.UserRepository;

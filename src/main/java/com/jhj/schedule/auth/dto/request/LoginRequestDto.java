@@ -1,4 +1,4 @@
-package com.jhj.schedule.auth.dto;
+package com.jhj.schedule.auth.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

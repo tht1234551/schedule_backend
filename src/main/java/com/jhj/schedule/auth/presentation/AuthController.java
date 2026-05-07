@@ -2,9 +2,12 @@ package com.jhj.schedule.auth.presentation;
 
 import com.jhj.schedule.auth.application.AuthService;
 import com.jhj.schedule.auth.dto.IssuedTokens;
-import com.jhj.schedule.auth.dto.SignUpRequestDto;
+import com.jhj.schedule.auth.dto.request.SignUpRequestDto;
 import com.jhj.schedule.auth.security.jwt.RefreshTokenCookieFactory;
-import com.jhj.schedule.user.dto.UserResponseDto;
+import com.jhj.schedule.common.annotation.CurrentUser;
+import com.jhj.schedule.user.domain.User;
+import com.jhj.schedule.auth.dto.request.PasswordUpdateRequestDto;
+import com.jhj.schedule.user.dto.response.UserResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping( "/api/v1/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -58,5 +61,15 @@ public class AuthController {
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, expire.toString())
                 .build();
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<?> changePassword(
+            @CurrentUser User user,
+            @Valid @RequestBody PasswordUpdateRequestDto requestDto
+    ) {
+        authService.changePassword(user, requestDto);
+
+        return ResponseEntity.noContent().build();
     }
 }

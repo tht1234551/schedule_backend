@@ -2,11 +2,11 @@ package com.jhj.schedule.auth.security.jwt;
 
 import com.jhj.schedule.auth.application.AuthService;
 import com.jhj.schedule.auth.dto.IssuedTokens;
-import com.jhj.schedule.auth.dto.LoginRequestDto;
+import com.jhj.schedule.auth.dto.request.LoginRequestDto;
+import com.jhj.schedule.auth.exception.AuthErrorCode;
 import com.jhj.schedule.auth.security.userdetail.CustomUserDetail;
 import com.jhj.schedule.common.exception.CustomRuntimeException;
 import com.jhj.schedule.common.exception.ErrorCode;
-import com.jhj.schedule.user.exception.UserErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,6 +92,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             HttpServletResponse response,
             AuthenticationException failed
     ) {
-        resolver.resolveException(request, response, null, new CustomRuntimeException(UserErrorCode.LOGIN_FAIL, failed));
+        resolver.resolveException(request, response, null, new CustomRuntimeException(AuthErrorCode.LOGIN_FAIL, failed));
     }
 }
