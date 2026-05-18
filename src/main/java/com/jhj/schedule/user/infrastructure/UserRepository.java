@@ -75,13 +75,13 @@ public class UserRepository {
         return user;
     }
 
-    public void updatePassword(Long id, String password) {
+    public void updatePassword(User user) {
         LocalDateTime now = LocalDateTime.now();
 
         dsl.update(USERS)
-                .set(USERS.PASSWORD, password)
+                .set(USERS.PASSWORD, user.getPassword())
                 .set(USERS.UPDATED_AT, now)
-                .where(USERS.ID.eq(id))
+                .where(USERS.ID.eq(user.getId()))
                 .execute();
     }
 

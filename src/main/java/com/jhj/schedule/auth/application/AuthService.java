@@ -93,6 +93,8 @@ public class AuthService {
             throw new CustomRuntimeException(AuthErrorCode.WRONG_PASSWORD);
         }
 
-        userRepository.updatePassword(userId, passwordEncoder.encode(request.getNewPassword()));
+        dbUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.updatePassword(dbUser);
     }
 }

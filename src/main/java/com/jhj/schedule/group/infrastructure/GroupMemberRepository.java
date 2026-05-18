@@ -229,6 +229,31 @@ public class GroupMemberRepository {
                 .map(this::toDomain);
     }
 
+    /*
+      // ① fetchExists로 감싸기 (← 권장)
+      dsl.fetchExists(
+          dsl.selectOne().from(GROUP_MEMBERS).where(...)
+      );
+      // SQL: SELECT EXISTS(SELECT 1 FROM ... WHERE ...) — 첫 매칭만 보고 단락
+
+      // ② fetchOptional + isPresent
+      dsl.selectOne().from(GROUP_MEMBERS).where(...).limit(1)
+         .fetchOptional().isPresent();
+
+      // ③ fetch().isNotEmpty()
+      dsl.selectOne().from(...).where(...).fetch().isNotEmpty();
+
+     */
+    public boolean existsJoinedMember(Long groupId, Long userId) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(GROUP_MEMBERS)
+                        .where(GROUP_MEMBERS.GROUP_ID.eq(groupId))
+                        .and(GROUP_MEMBERS.USER_ID.eq(userId))
+                        .and(GROUP_MEMBERS.STATUS.eq(GroupMemberStatus.JOINED.name()))
+        );
+    }
+
     private GroupMember toDomain(Record r) {
         return GroupMember.builder()
                 .id(r.get(GROUP_MEMBERS.ID))

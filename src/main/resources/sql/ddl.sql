@@ -4,8 +4,6 @@ create table IF NOT EXISTS users
         primary key,
     authority  varchar(10)
         constraint users_authority_check
---             check ((authority)::text = ANY
---                    ((ARRAY ['ROLE_USER'::character varying, 'ROLE_ADMIN'::character varying])::text[])),
             check (authority in ('ROLE_USER', 'ROLE_ADMIN')),
     avatar     varchar(100),
     email      varchar(100) not null

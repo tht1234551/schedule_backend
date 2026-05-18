@@ -46,7 +46,7 @@ public class JobCreateRequestDto {
         if (ownerType == OwnerType.GROUP) {
             return groupId != null;
         } else {
-            return groupId == null; // USER일 때 groupId는 null이어야
+            return groupId == null;
         }
     }
 }

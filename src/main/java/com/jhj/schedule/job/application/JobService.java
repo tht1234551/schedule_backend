@@ -1,7 +1,12 @@
 package com.jhj.schedule.job.application;
 
 
+import com.jhj.schedule.common.exception.CustomRuntimeException;
 import com.jhj.schedule.group.dto.response.GroupJobsResponseDto;
+import com.jhj.schedule.group.exception.GroupAccessDeniedException;
+import com.jhj.schedule.group.exception.GroupErrorCode;
+import com.jhj.schedule.group.infrastructure.GroupMemberRepository;
+import com.jhj.schedule.group.infrastructure.GroupRepository;
 import com.jhj.schedule.job.domain.Job;
 import com.jhj.schedule.job.domain.JobPatch;
 import com.jhj.schedule.job.domain.OwnerType;
@@ -23,6 +28,7 @@ import java.util.List;
 public class JobService {
 
     private final JobRepository jobRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
     @Transactional(readOnly = true)
     public List<JobResponseDto> findPersonalJobs(User user, JobMonthRequestDto request) {
@@ -35,8 +41,8 @@ public class JobService {
 
     @Transactional
     public JobResponseDto save(User user, JobCreateRequestDto requestDto) {
-        // TODO 그룹일정일 경우 권한 확인 필요함
-//        if (requestDto.getOwnerType() == OwnerType.GROUP){}
+        verifyGroupAccessIfNeeded(user, requestDto);
+
         Job job = JobMapper.toDomain(requestDto, user);
         job.validatePeriod();
 
@@ -81,4 +87,15 @@ public class JobService {
                 .jobs(jobResponses)
                 .build();
     }
+
+    private void verifyGroupAccessIfNeeded(User user, JobCreateRequestDto requestDto) {
+        if (requestDto.getOwnerType() != OwnerType.GROUP) {
+            return;
+        }
+
+        if (!groupMemberRepository.existsJoinedMember(requestDto.getGroupId(), user.getId())) {
+            throw new GroupAccessDeniedException(GroupErrorCode.GROUP_MEMBER_NOT_FOUND);
+        }
+    }
+
 }
