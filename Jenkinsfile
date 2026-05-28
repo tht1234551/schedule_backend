@@ -8,9 +8,8 @@ pipeline {
     stages {
         stage('Gradle Build') {
             steps {
-                echo "Gradle Build"
-                sh 'pwd'
-                sh 'ls'
+                sh "chmod +x gradlew"
+                sh "./gradlew clean"
                 sh "./gradlew build"
 
 //                sh 'chmod +x gradlew &amp;&amp; ./gradlew clean &amp;&amp; ./gradlew build -x test --stacktrace'
