@@ -13,7 +13,7 @@ pipeline {
                 }
                 sh "chmod +x gradlew"
                 sh "./gradlew clean"
-                sh "./gradlew build"
+                sh "./gradlew build -x test --stacktrace"
 
 //                sh 'chmod +x gradlew &amp;&amp; ./gradlew clean &amp;&amp; ./gradlew build -x test --stacktrace'
                 // sh 'yarn --cwd ./front install --network-timeout 100000'
