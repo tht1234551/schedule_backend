@@ -8,6 +8,9 @@ pipeline {
     stages {
         stage('Gradle Build') {
             steps {
+                withEnv(["JAVA_HOME=${tool 'openjdk-21.0.2'}", "PATH=${tool 'openjdk-21.0.2'}/bin:${env.PATH}"]) {
+
+                }
                 sh "chmod +x gradlew"
                 sh "./gradlew clean"
                 sh "./gradlew build"
