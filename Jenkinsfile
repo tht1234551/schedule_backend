@@ -10,6 +10,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'application-secret.yaml', variable: 'secretFile')]) {
                     sh 'cp $secretFile ./src/main/resources/application-secret.yaml'
+//                    sh 'sudo chmod 644 src/main/resources/application-secret.yaml'
                 }
 
                 sh "chmod +x gradlew"

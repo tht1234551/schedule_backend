@@ -25,7 +25,7 @@ LOG_DIR="${APP_DIR}/logs"   # 로그는 배포와 무관하게 보존 (tail -f �
 RUN_DIR="${APP_DIR}/run"    # PID 파일도 jar 디렉터리와 분리해 보존
 INC_FILE="/etc/nginx/conf.d/service-url.inc"
 HEALTH_PATH="/actuator/health"
-HEALTH_TIMEOUT=60          # health 최대 대기(초)
+HEALTH_TIMEOUT=120          # health 최대 대기(초)
 HEALTH_INTERVAL=2          # health 폴링 간격(초)
 STOP_WAIT=10               # 구버전 graceful 종료 대기(초)
 JAVA_BIN="${JAVA_BIN:-java}"   # 필요 시 절대경로로 override (예: JAVA_BIN=/usr/lib/jvm/.../bin/java)
