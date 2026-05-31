@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PORT = "8082"
-    }
-
     stages {
         stage('Gradle Build') {
             steps {
@@ -36,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('SSH transfer') {
+        stage('SSH transfer & Deploy') {
             steps([$class: 'BapSshPromotionPublisherPlugin']) {
                 sshPublisher(
                     continueOnError: false,
@@ -46,15 +42,18 @@ pipeline {
                             configName: "oracle server",//Jenkins 시스템 정보에 사전 입력한 서버 ID
                             verbose: true,
                             transfers: [
+                                // 1) 배포 스크립트/nginx 설정 전송 (deploy/ 하위 구조 유지)
+                                sshTransfer(
+                                    sourceFiles: "deploy/**", //전송할 파일
+                                    remoteDirectory: "./", //배포할 위치 (~/deploy/ 로 전개됨)
+                                    execCommand: "" //이 전송 후 실행할 커맨드 없음
+                                ),
+                                // 2) 빌드 산출물(tar.gz) 전송 후 무중단 배포 스크립트 실행
                                 sshTransfer(
                                     sourceFiles: "${env.jarname}.tar.gz", //전송할 파일
-//                                    removePrefix: "", //파일에서 삭제할 경로가 있다면 작성
-                                    remoteDirectory: "./", //배포할 위치
-                                    execCommand: "pwd" //원격지에서 실행할 커맨드
+                                    remoteDirectory: "./", //배포할 위치 (~/ 에 위치)
+                                    execCommand: "bash ~/deploy/deploy.sh ~/${env.jarname}.tar.gz" //무중단 배포 실행
                                 ),
-                                sshTransfer(
-                                    execCommand: 'echo run'
-                                )
                             ]
                         )
                     ]
@@ -62,15 +61,9 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps{
-                echo "Deploy"
-            }
-        }
-
        stage('Finish') {
             steps{
-                echo "Finish"
+                echo "Deploy finished"
             }
         }
     }
