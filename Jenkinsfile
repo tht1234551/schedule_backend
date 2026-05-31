@@ -1,22 +1,21 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'openjdk-21.0.2'
+    }
+
     stages {
         stage('Gradle Build') {
             steps {
-                withEnv(["JAVA_HOME=${tool 'openjdk-21.0.2'}", "PATH=${tool 'openjdk-21.0.2'}/bin:${env.PATH}"]) {
-                    withCredentials([file(credentialsId: 'application-secret.yaml', variable: 'secretFile')]) {
-                        sh 'cp $secretFile ./src/main/resources/application-secret.yaml'
-                    }
-
-                    sh "chmod +x gradlew"
-                    sh "./gradlew clean"
-                    sh "./gradlew build -x test --stacktrace"
+                withCredentials([file(credentialsId: 'application-secret.yaml', variable: 'secretFile')]) {
+                    sh 'cp $secretFile ./src/main/resources/application-secret.yaml'
                 }
 
+                sh "chmod +x gradlew"
+                sh "./gradlew clean"
+                sh "./gradlew build -x test --stacktrace"
 
-
-//                sh 'chmod +x gradlew &amp;&amp; ./gradlew clean &amp;&amp; ./gradlew build -x test --stacktrace'
                 // sh 'yarn --cwd ./front install --network-timeout 100000'
                 // sh 'yarn --cwd ./front build'
             }
