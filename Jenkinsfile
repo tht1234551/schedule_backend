@@ -21,12 +21,42 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                echo "Docker Build"
+        stage('make deploy file'){
+            steps{
+                script{
+                    //baseline 커맨드를 이용해 war파일명을 가져온다
+                    env.jarname = sh (script: 'basename build/libs/*.jar', returnStdout: true ).trim()
+                    echo env.jarname
 
+                    //war 파일과 config폴더를 묶어서 압축한다.
+                    sh ("mv build/libs/*.war ./")
+                    sh ("tar -czvf ${env.jarname}.tar.gz *.war ./config")
+                    sh ("rm -f *.war")
+                }
             }
         }
+
+//        stage('SSH transfer') {
+//            steps([$class: 'BapSshPromotionPublisherPlugin']) {
+//                sshPublisher(
+//                    continueOnError: false, failOnError: true,
+//                    publishers: [
+//                        sshPublisherDesc(
+//                            configName: "DEVDEV",//Jenkins 시스템 정보에 사전 입력한 서버 ID
+//                            verbose: true,
+//                            transfers: [
+//                                sshTransfer(
+//                                    sourceFiles: "${env.warname}.tar.gz", //전송할 파일
+//                                    removePrefix: "", //파일에서 삭제할 경로가 있다면 작성
+//                                    remoteDirectory: "/sorc001/temp/" //배포할 위치
+//                                    execCommand: "ls -al /sorc001/temp/" //원격지에서 실행할 커맨드
+//                                )
+//                            ]
+//                        )
+//                    ]
+//                )
+//            }
+//        }
 
         stage('Deploy') {
             steps{
