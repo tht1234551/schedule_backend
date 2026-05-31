@@ -39,6 +39,40 @@ fi
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
+# 지정 포트에서 LISTEN 중인 PID 반환 (없으면 빈 문자열)
+pid_on_port() {
+    local port="$1"
+    ss -ltnpH "sport = :${port}" 2>/dev/null | grep -oE 'pid=[0-9]+' | head -n 1 | grep -oE '[0-9]+'
+}
+
+# 포트의 앱을 종료. PID 파일을 우선 사용하되, 없거나 stale 이면 포트 점유 프로세스로 대체.
+# 이렇게 해야 PID 파일이 유실/불일치해도 구버전이 확실히 종료된다.
+stop_instance() {
+    local port="$1" pidfile="$2" pid=""
+
+    if [[ -f "${pidfile}" ]]; then
+        pid="$(cat "${pidfile}" 2>/dev/null || true)"
+    fi
+    # PID 파일이 없거나 그 프로세스가 살아있지 않으면 포트 기반으로 다시 찾는다.
+    if [[ -z "${pid}" ]] || ! kill -0 "${pid}" 2>/dev/null; then
+        pid="$(pid_on_port "${port}" || true)"
+    fi
+
+    if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null; then
+        log "포트 ${port} 프로세스(PID ${pid}) 종료 시도"
+        kill "${pid}" 2>/dev/null || true
+        for _ in $(seq 1 "${STOP_WAIT}"); do
+            kill -0 "${pid}" 2>/dev/null || break
+            sleep 1
+        done
+        kill -9 "${pid}" 2>/dev/null || true
+        log "포트 ${port} 프로세스 종료 완료"
+    else
+        log "포트 ${port} 에 종료할 프로세스 없음"
+    fi
+    rm -f "${pidfile}"
+}
+
 # ===== 1) active 포트 판별 → TARGET 결정 =====
 CURRENT_PORT=""
 if [[ -f "${INC_FILE}" ]]; then
@@ -74,13 +108,7 @@ fi
 log "배포 jar: ${JAR_FILE}"
 
 # ===== 3) TARGET 포트 잔여 프로세스 정리 =====
-if [[ -f "${PID_FILE}" ]] && kill -0 "$(cat "${PID_FILE}")" 2>/dev/null; then
-    OLD_TARGET_PID="$(cat "${PID_FILE}")"
-    log "TARGET 포트의 잔여 프로세스(${OLD_TARGET_PID}) 종료"
-    kill "${OLD_TARGET_PID}" 2>/dev/null || true
-    sleep "${STOP_WAIT}"
-    kill -9 "${OLD_TARGET_PID}" 2>/dev/null || true
-fi
+stop_instance "${TARGET_PORT}" "${PID_FILE}"
 
 # ===== 4) 신버전 기동 =====
 log "신버전 기동 (포트 ${TARGET_PORT}, 프로파일 ${PROFILE})"
@@ -138,14 +166,8 @@ log "nginx reload 완료"
 
 # ===== 8) 구버전 종료 =====
 if [[ -n "${CURRENT_PORT}" && "${CURRENT_PORT}" != "${TARGET_PORT}" ]]; then
-    OLD_PID_FILE="${RUN_DIR}/app-${CURRENT_PORT}.pid"
-    if [[ -f "${OLD_PID_FILE}" ]] && kill -0 "$(cat "${OLD_PID_FILE}")" 2>/dev/null; then
-        OLD_PID="$(cat "${OLD_PID_FILE}")"
-        log "구버전(포트 ${CURRENT_PORT}, PID ${OLD_PID}) 종료"
-        kill "${OLD_PID}" 2>/dev/null || true
-        sleep "${STOP_WAIT}"
-        kill -9 "${OLD_PID}" 2>/dev/null || true
-    fi
+    log "구버전(포트 ${CURRENT_PORT}) 종료"
+    stop_instance "${CURRENT_PORT}" "${RUN_DIR}/app-${CURRENT_PORT}.pid"
 fi
 
 log "배포 완료 ✅ (active 포트: ${TARGET_PORT})"
