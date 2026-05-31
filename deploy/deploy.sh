@@ -21,6 +21,8 @@ BLUE=8081
 GREEN=8082
 PROFILE=prod
 APP_DIR="${HOME}/app"
+LOG_DIR="${APP_DIR}/logs"   # 로그는 배포와 무관하게 보존 (tail -f 대상)
+RUN_DIR="${APP_DIR}/run"    # PID 파일도 jar 디렉터리와 분리해 보존
 INC_FILE="/etc/nginx/conf.d/service-url.inc"
 HEALTH_PATH="/actuator/health"
 HEALTH_TIMEOUT=60          # health 최대 대기(초)
@@ -51,11 +53,14 @@ else
 fi
 log "현재 active 포트: '${CURRENT_PORT:-없음}' → 배포 대상(TARGET) 포트: ${TARGET_PORT}"
 
-TARGET_DIR="${APP_DIR}/${TARGET_PORT}"
-PID_FILE="${TARGET_DIR}/app.pid"
-LOG_FILE="${TARGET_DIR}/app.log"
+TARGET_DIR="${APP_DIR}/${TARGET_PORT}"          # jar 압축 해제 위치 (매 배포 교체)
+PID_FILE="${RUN_DIR}/app-${TARGET_PORT}.pid"    # 보존 (배포 시 삭제 안 함)
+LOG_FILE="${LOG_DIR}/app-${TARGET_PORT}.log"    # 보존 (tail -f ~/app/logs/app-<port>.log)
 
-# ===== 2) 압축 해제 =====
+# 로그/PID 디렉터리는 미리 만들어 두고 절대 삭제하지 않는다.
+mkdir -p "${LOG_DIR}" "${RUN_DIR}"
+
+# ===== 2) 압축 해제 (jar 디렉터리만 교체) =====
 log "압축 해제: ${TARBALL} → ${TARGET_DIR}"
 rm -rf "${TARGET_DIR}"
 mkdir -p "${TARGET_DIR}"
@@ -79,13 +84,20 @@ fi
 
 # ===== 4) 신버전 기동 =====
 log "신버전 기동 (포트 ${TARGET_PORT}, 프로파일 ${PROFILE})"
+# 로그는 append(>>)로 누적해 이전 기동 내역까지 보존한다. 각 기동마다 구분선을 남긴다.
+{
+    echo ""
+    echo "==================================================================="
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] 새 배포 기동 / jar=${JAR_FILE}"
+    echo "==================================================================="
+} >> "${LOG_FILE}"
 nohup "${JAVA_BIN}" -jar "${JAR_FILE}" \
     --spring.profiles.active="${PROFILE}" \
     --server.port="${TARGET_PORT}" \
-    > "${LOG_FILE}" 2>&1 &
+    >> "${LOG_FILE}" 2>&1 &
 NEW_PID=$!
 echo "${NEW_PID}" > "${PID_FILE}"
-log "기동 PID: ${NEW_PID} (로그: ${LOG_FILE})"
+log "기동 PID: ${NEW_PID} (로그: tail -f ${LOG_FILE})"
 
 # ===== 5) 헬스 게이트 =====
 log "헬스체크 시작: http://127.0.0.1:${TARGET_PORT}${HEALTH_PATH} (최대 ${HEALTH_TIMEOUT}초)"
@@ -126,7 +138,7 @@ log "nginx reload 완료"
 
 # ===== 8) 구버전 종료 =====
 if [[ -n "${CURRENT_PORT}" && "${CURRENT_PORT}" != "${TARGET_PORT}" ]]; then
-    OLD_PID_FILE="${APP_DIR}/${CURRENT_PORT}/app.pid"
+    OLD_PID_FILE="${RUN_DIR}/app-${CURRENT_PORT}.pid"
     if [[ -f "${OLD_PID_FILE}" ]] && kill -0 "$(cat "${OLD_PID_FILE}")" 2>/dev/null; then
         OLD_PID="$(cat "${OLD_PID_FILE}")"
         log "구버전(포트 ${CURRENT_PORT}, PID ${OLD_PID}) 종료"
