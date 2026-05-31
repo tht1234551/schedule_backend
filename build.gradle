@@ -104,3 +104,7 @@ jooq {
 tasks.named('generateJooq').configure {
     allInputsDeclared = true
 }
+
+tasks.jar {
+    enabled = false
+}
