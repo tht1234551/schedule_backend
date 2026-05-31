@@ -48,9 +48,12 @@ pipeline {
                             transfers: [
                                 sshTransfer(
                                     sourceFiles: "${env.warname}.tar.gz", //전송할 파일
-                                    removePrefix: "", //파일에서 삭제할 경로가 있다면 작성
-                                    remoteDirectory: "/home/rocky", //배포할 위치
-                                    execCommand: "ls -al /home/rocky" //원격지에서 실행할 커맨드
+//                                    removePrefix: "", //파일에서 삭제할 경로가 있다면 작성
+                                    remoteDirectory: "./", //배포할 위치
+                                    execCommand: "pwd" //원격지에서 실행할 커맨드
+                                ),
+                                sshTransfer(
+                                    execCommand: 'echo run'
                                 )
                             ]
                         )
