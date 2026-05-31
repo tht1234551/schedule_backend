@@ -24,14 +24,14 @@ pipeline {
         stage('make deploy file'){
             steps{
                 script{
-                    //baseline 커맨드를 이용해 war파일명을 가져온다
+                    //baseline 커맨드를 이용해 jar파일명을 가져온다
                     env.jarname = sh (script: 'basename build/libs/*.jar', returnStdout: true ).trim()
                     echo env.jarname
 
                     //war 파일과 config폴더를 묶어서 압축한다.
-                    sh ("mv build/libs/*.war ./")
-                    sh ("tar -czvf ${env.jarname}.tar.gz *.war ./config")
-                    sh ("rm -f *.war")
+                    sh ("mv build/libs/*.jar ./")
+                    sh ("tar -czvf ${env.jarname}.tar.gz *.jar")
+                    sh ("rm -f *.jar")
                 }
             }
         }
